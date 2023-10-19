@@ -3,5 +3,37 @@
 @tailwind utilities;
 
 :root {
-    /*insert stylsheet here*/
+    /* ALL THESE VALUES NEED TO BE REPLACED */
+
+    /* Main Colours */
+    --colour-primary: black;
+    --colour-secondary: grey;
+    --colour-accent: blue;
+    --background-colour: orange;
+
+    /* Text Styles */
+    --colour-text: white;
+    --font-size: 0.5rem;
+    --font-family: Arial;
+
+    /* Element Styling */
+    --rounding: 1rem;
+    --box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+/* General Base Element Style */
+p{
+
+}
+
+h1{
+
+}
+
+a {
+
+}
+
+button{
+
 }
