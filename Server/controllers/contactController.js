@@ -3,6 +3,17 @@ const nodemailer = require('nodemailer');
 
 exports.sendContactFormInfo = catchAsync(async (req, res, next) => {
 
-    // Send an email to Link Health via contact form with info in the req object using nodemailer
+    const contactInfo = req.query;
+
+    /*
+
+    req.query = {
+        firstName: string,
+        lastName: string,
+        email: string,
+        message: string,
+    }
+
+    */
 
 })
