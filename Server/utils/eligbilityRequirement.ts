@@ -6,7 +6,7 @@ interface EligbilityRequirement {
 interface Rule {
     fieldName: string,
     comparisonOperator: "="
-    value: boolean|number|Rule,
+    value: boolean|number|EligbilityRequirement,
 }
 
 interface Program {
