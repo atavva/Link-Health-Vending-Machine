@@ -1,12 +1,12 @@
 interface EligbilityRequirement {
     condition: "AND"|"OR",
-    rules: Rule[],
+    rules: (Rule|EligbilityRequirement)[],
 }
 
 interface Rule {
     fieldName: string,
     comparisonOperator: "="
-    value: boolean|number|EligbilityRequirement,
+    value: boolean|number|string,
 }
 
 interface Program {

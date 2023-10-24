@@ -17,9 +17,9 @@ const allPrograms = () => {
       eligibility: [
         {
           condition: "OR",
-          rule: [
+          rules: [
             {
-              fieldName: "max_agi",
+              fieldName: "agi",
               comparisonOperator: "<=",
               value: 13425,
             },
@@ -40,7 +40,7 @@ const allPrograms = () => {
           condition: "OR",
           rules: [
             {
-              fieldName: "max_poverty_level",
+              fieldName: "poverty_level",
               comparisonOperator: "<=",
               value: 1.38,
             },
@@ -61,17 +61,27 @@ const allPrograms = () => {
           condition: "AND",
           rules: [
             {
-              fieldName: "max_agi",
+              fieldName: "agi",
               comparisonOperator: "<=",
               value: 59293,
             },
             {
-              fieldName: "min_dependencies",
+              fieldName: "dependencies",
               comparisonOperator: ">=",
               value: 2,
             },
           ],
         },
+        {
+            condition: "OR",
+            rules: [
+                {
+                    fieldName: "agi",
+                    comparisonOperator: "<=",
+                    value: 20000,
+                }
+            ]
+        }
       ],
       shortDesc: "Federal food security program",
       longDesc:
@@ -94,7 +104,10 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 
   // Filter the programs by eligibility info
   /* YOUR CODE HERE */
-  const filteredPrograms = determineEligibilityForAllPrograms(eligibility, programs);
+  const filteredPrograms = determineEligibilityForAllPrograms(
+    eligibility,
+    programs
+  );
 
   // Check that the programs were available. If no programs were recieved, raise a status code 503 Service Unavailable Error
   if (!filteredPrograms) {
