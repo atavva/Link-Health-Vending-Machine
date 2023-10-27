@@ -2,92 +2,26 @@ const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const determineEligibilityForAllPrograms = require("../utils/determineEligibilty");
 
-const allPrograms = () => {
+const { createClient } = require('@supabase/supabase-js');
+
+// Initialize the Supabase client
+const supabase = createClient(
+  'https://juhxzbhlztuqtxwkpavi.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aHh6YmhsenR1cXR4d2twYXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MDk2NzYsImV4cCI6MjAxMjM4NTY3Nn0.MVDY_Ofxgtmt_CnsVD0Z_yb40oYk53Kdfh5kbH5QSk0'
+);
+
+const allPrograms = async () => {
   // Utility function
   // RETURNS: List of all the programs in the database
   // Return type: Program[]
   /* YOUR CODE HERE */
 
   /*DUMMY CODE*/
-  const programs = [
-    {
-      id: "hdUe183nK38ddlaks849flhf",
-      programName: "Aidan Gives Away Money",
-      jurisdiction: "US",
-      eligibility: [
-        {
-          condition: "OR",
-          rules: [
-            {
-              fieldName: "agi",
-              comparisonOperator: "<=",
-              value: 13425,
-            },
-          ],
-        },
-      ],
-      shortDesc: "Free money",
-      longDesc:
-        "Aidan is giving away free money to anyone with a max annual income of $13254",
-      imagePath: null,
-    },
-    {
-      id: "h3duwao8321idjDH7wgUwjK8",
-      programName: "Medi-Cal",
-      jurisdiction: "CA",
-      eligibility: [
-        {
-          condition: "OR",
-          rules: [
-            {
-              fieldName: "poverty_level",
-              comparisonOperator: "<=",
-              value: 1.38,
-            },
-          ],
-        },
-      ],
-      shortDesc: "California public health care",
-      longDesc:
-        "Free health care for any in California below 138% of the poverty line",
-      imagePath: null,
-    },
-    {
-      id: "37dhhwjUgwtOaowao9hkdwauk",
-      programName: "SNAP",
-      jurisdiction: "US",
-      eligibility: [
-        {
-          condition: "AND",
-          rules: [
-            {
-              fieldName: "agi",
-              comparisonOperator: "<=",
-              value: 59293,
-            },
-            {
-              fieldName: "dependencies",
-              comparisonOperator: ">=",
-              value: 2,
-            },
-          ],
-        },
-        {
-            condition: "OR",
-            rules: [
-                {
-                    fieldName: "agi",
-                    comparisonOperator: "<=",
-                    value: 20000,
-                }
-            ]
-        }
-      ],
-      shortDesc: "Federal food security program",
-      longDesc:
-        "Federal program that provides credits to spend at the grocery store",
-    },
-  ];
+  let { data: programs, error } = await supabase
+    .from('programs')
+    .select('program_id')
+
+  
 
   return programs;
 
