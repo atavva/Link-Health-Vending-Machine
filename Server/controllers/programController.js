@@ -17,15 +17,10 @@ const allPrograms = async () => {
   /* YOUR CODE HERE */
 
   /*DUMMY CODE*/
-  let { data, error } = await supabase.from("programs").select();
 
-  if (supabase.state === "open") {
-    console.log("Supabase client is connected.");
-  } else {
-    console.log("Supabase client is not connected.");
-  }
+  let { data: programs, error } = await supabase.from("programs").select("*");
 
-  return data;
+  return programs;
 
   /*END DUMMY CODE*/
 };
