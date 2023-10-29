@@ -8,6 +8,7 @@ module.exports = (eligibility, programs) => {
   if (Object.keys(eligibility).length === 0) {
     return programs;
   }
+
   // Run a filter using determineEligibility for each program
   const eligiblePrograms = programs.filter((program) =>
     determineEligibility(eligibility, program.eligibility)
