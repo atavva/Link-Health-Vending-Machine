@@ -80,8 +80,6 @@ const evaluateEligibilityRequirement = (
 ) => {
   // Check if the condition is 'AND' or 'OR'-- use any or all appropriately
   const returnOnVal = eligibilityRequirement.condition === "OR";
-  console.log(returnOnVal);
-  console.log(eligibilityRequirement);
 
   for (let i = 0; i < eligibilityRequirement.rules.length; i++) {
     const currCondition = eligibilityRequirement.rules[i];
