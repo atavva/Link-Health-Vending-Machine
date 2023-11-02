@@ -7,6 +7,7 @@ const globalErrorHandler = require("./controllers/errorController");
 const userRouter = require("./routers/userRouter");
 const programRouter = require("./routers/programRouter");
 const contactRouter = require("./routers/contactRouter");
+const eligibilityRouter = require("./routers/eligibilityRouter");
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use("/api/users", userRouter);
 app.use("/api/programs", programRouter);
 app.use("/api/contact", contactRouter);
+app.use("/api/eligibility", eligibilityRouter);
 
 app.all("*", (req, res, next) => {
   const err = new AppError(
