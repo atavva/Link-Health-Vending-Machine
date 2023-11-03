@@ -11,10 +11,10 @@ interface Rule {
 
 interface Program {
     id: string,
-    programName: string,
+    program_name: string,
     jursdition: string,
     eligibility: EligbilityRequirement[],
-    shortDesc: string,
-    longDesc: string,
-    imagePath: string,
+    short_desc: string,
+    long_desc: string,
+    image_path: string,
 }

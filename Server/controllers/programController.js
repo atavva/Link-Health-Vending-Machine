@@ -1,14 +1,7 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const determineEligibilityForAllPrograms = require("../utils/determineEligibilty");
-
-const { createClient } = require("@supabase/supabase-js");
-
-// Initialize the Supabase client
-const supabase = createClient(
-  "https://juhxzbhlztuqtxwkpavi.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aHh6YmhsenR1cXR4d2twYXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MDk2NzYsImV4cCI6MjAxMjM4NTY3Nn0.MVDY_Ofxgtmt_CnsVD0Z_yb40oYk53Kdfh5kbH5QSk0"
-);
+const supabase = require("../utils/client");
 
 const allPrograms = async () => {
   // Utility function
@@ -17,6 +10,8 @@ const allPrograms = async () => {
   /* YOUR CODE HERE */
 
   /*DUMMY CODE*/
+
+  console.log(process.env.SUPABASE_URL);
 
   let { data: programs, error } = await supabase.from("programs").select("*");
 
