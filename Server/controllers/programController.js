@@ -6,12 +6,7 @@ const supabase = require("../utils/client");
 const allPrograms = async () => {
   // Utility function
   // RETURNS: List of all the programs in the database
-  // Return type: Program[]
-  /* YOUR CODE HERE */
 
-  /*DUMMY CODE*/
-
-  console.log(process.env.SUPABASE_URL);
 
   let { data: programs, error } = await supabase.from("programs").select("*");
 
@@ -56,10 +51,10 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 exports.getProgramById = catchAsync(async (req, res, next) => {
   // Get the requested ID
   const id = req.params.id;
-  const programs = allPrograms;
+  const programs = await allPrograms();
   // Filter the programs to the existing ID
   /* YOUR CODE HERE */
-  const program = programs.find(program => program.id === id);
+  const program = programs.find(program => program.program_id == id);
   // Raise an error if that program doesn't exist
   /* YOUR CODE HERE */
   if (!program) {
