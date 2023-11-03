@@ -13,4 +13,22 @@ module.exports = (unknownPrograms, eligibility) => {
  * @param {Programs[]} cleanedPrograms a list of programs that have been cleaned by fixProgramNesting
  * @returns {string} the name of the most valued eligibility to know given the heuristic in the function
  */
-const evaluateBestQuestion = (cleanedPrograms) => {};
+const evaluateBestQuestion = (cleanedPrograms) => {
+    let elig = {};
+    for (let i = 0; i < cleanedPrograms.length; i++) {
+        
+    }
+};
+
+/**
+ * Determines the value of each eligibility info in an eligibility requirement
+ * @param {EligbilityRequirement} eligibility 
+ * @returns {{[key: string]: number}} such that all keys in Object.keys is in supabase.public.eligibility["Field Name"] 
+ */
+const evaluateBestQuestionPerProgram = (eligibility) => {
+    let elig = {};
+};
+
+
+
+

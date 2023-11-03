@@ -56,10 +56,10 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 exports.getProgramById = catchAsync(async (req, res, next) => {
   // Get the requested ID
   const id = req.params.id;
-  const programs = allPrograms;
+  const programs = await allPrograms();
   // Filter the programs to the existing ID
   /* YOUR CODE HERE */
-  const program = programs.find(program => program.id === id);
+  const program = programs.find(program => program.program_id == id);
   // Raise an error if that program doesn't exist
   /* YOUR CODE HERE */
   if (!program) {
