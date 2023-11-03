@@ -6,12 +6,7 @@ const supabase = require("../utils/client");
 const allPrograms = async () => {
   // Utility function
   // RETURNS: List of all the programs in the database
-  // Return type: Program[]
-  /* YOUR CODE HERE */
 
-  /*DUMMY CODE*/
-
-  console.log(process.env.SUPABASE_URL);
 
   let { data: programs, error } = await supabase.from("programs").select("*");
 
