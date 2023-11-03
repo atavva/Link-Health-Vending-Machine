@@ -61,15 +61,22 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 exports.getProgramById = catchAsync(async (req, res, next) => {
   // Get the requested ID
   const id = req.params.id;
-
+  const programs = allPrograms;
   // Filter the programs to the existing ID
   /* YOUR CODE HERE */
-
+  const program = programs.find(program => program.id === id);
   // Raise an error if that program doesn't exist
   /* YOUR CODE HERE */
+  if (!program) {
+    return next(new AppError('Program not found', 404));
+  }
 
   // Send the program back
   /* YOUR CODE HERE */
+  res.status(200).json({
+    status: 'success',
+    data: program,
+  });
 });
 
 // POST request to register for a program
@@ -80,7 +87,9 @@ exports.registerForProgram = catchAsync(async (req, res, next) => {
 
   // Raise a status code 400 Bad Request error if we don't have a handler function for that program
   /* YOUR CODE HERE */
-
+  if (!program.handlerFunction) {
+    return next(new AppError('No handler function for this program', 400));
+  }
   // Pass in the necessary information to the program handler function and send a success response if successful
   /* YOUR CODE HERE */
 });

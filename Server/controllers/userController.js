@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
-const allUsers = () => {
+const allUsers = async () => {
   // Utility function
   // RETURNS: List of all users in the database
   // Return type: User[]
@@ -21,19 +21,23 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 
   // Check if they are an admin or not
   /* YOUR CODE HERE */
+  const isAdmin = user.isAdmin;
 
   // If they are not an admin:
-
+  if (!isAdmin) {
   //    Send back the information on the single user with success status code 200
   /*    YOUR CODE HERE */
-
+    res.status(200).json({user})
+  }
   // If they are an admin:
-
+  else {
   //    Segment the data to get (total users / total admin users) users (we can figure this out later)
   /*    YOUR CODE HERE */
 
   //    Send back the information on the multiple users with success status code 200
   /*    YOUR CODE HERE */
+    res.status(200).json({allUsers})
+  }
 });
 
 // POST signup user
@@ -64,6 +68,29 @@ exports.login = catchAsync(async (req, res, next) => {
 exports.deleteUser = catchAsync(async (req, res, next) => {
   // Verify the user is logged in, and get their user ID from JWT
   /* YOUR CODE HERE */
+
+  //const decoded = jwt.verify(token, config.get('jwtPrivateKey'));  
+  //var userId = decoded.id 
+  //idk which one works
+
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = await verifyToken(token);
+  const userId = decoded.id;
+
+  try {
+    const user = User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isAdmin || user._id.toString() === userId) {
+      User.findByIdAndRemove(userId)
+      return res.status(204).json(); 
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
   // Delete the user from the database
   /* YOUR CODE HERE */
 });
@@ -72,10 +99,30 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 exports.patchUser = catchAsync(async (req, res, next) => {
   // Verify the user is logged in, and get their user ID from JWT
   /* YOUR CODE HERE */
+  const token = req.headers.authorization.split(' ')[1];
+  const decoded = await verifyToken(token);
+  const userId = decoded.id;
 
   // Get the info the user wants to change
   const updatedInfo = req.query;
 
   // Change the info in the database
   /* YOUR CODE HERE */
+  try {
+    const user = User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user._id.toString() === userId) {
+      Object.assign(user, updatedInfo);
+      user.save();
+      return res.status(200).json({ user });
+    } else {
+      return res.status(403).json({ message: 'Unauthorized to update this user' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
 });
