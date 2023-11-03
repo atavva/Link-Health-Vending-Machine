@@ -54,7 +54,7 @@ const evaluateRule = (eligibility, rule) => {
   // Check eligibility by case
   switch (rule.comparisonOperator) {
     case "=":
-      return userVal == rule.value;
+      return userVal == String(rule.value);
     case "<=":
       return userVal <= rule.value;
     case ">=":

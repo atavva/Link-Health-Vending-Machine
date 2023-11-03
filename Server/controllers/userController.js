@@ -1,5 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const supabase = require("../utils/client");
+
 
 const allUsers = async () => {
   // Utility function
@@ -43,17 +45,51 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 // POST signup user
 exports.signup = catchAsync(async (req, res, next) => {
   // Get the info about the user
-  const newUserInfo = req.params;
+  const newUserInfo = req.query;
 
   // Sign the user up
-  /* YOUR CODE HERE */
+  // THIS IS BAD AND ONLY FOR TESTING DEAR GOD DONT KEEP THIS
+  const { data, error } = await supabase.auth.signUp({
+    email : newUserInfo['email'],
+    password : newUserInfo['password']
+  })
+
+  console.log(data, error)
+
+  if (error) {
+    res.status(error["status"]).json({
+      status: 'fail',
+      error,
+    })
+  }
+  
+  res.status(201).json({
+    status: 'success'
+  })
 });
 
 // POST login user
 exports.login = catchAsync(async (req, res, next) => {
   // Get the info about the user who is trying to log in
-  const userInfo = req.params;
+  const userInfo = req.query;
 
+  const { data, error } =await supabase.auth.signInWithPassword({
+    email : userInfo['email'],
+    password : userInfo['password']
+  })
+  
+  console.log(data, error);
+
+  if (error) {
+    res.status(error["status"]).json({
+      status: 'fail',
+      error,
+    })
+  }
+  
+  res.status(201).json({
+    status: 'success'
+  })
   // Validate that the user login info matches an instance in the database
   /* YOUR CODE HERE */
 
