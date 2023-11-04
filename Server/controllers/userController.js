@@ -62,10 +62,12 @@ exports.signup = catchAsync(async (req, res, next) => {
       error,
     })
   }
+  else {
+    res.status(201).json({
+      status: 'success'
+    })
+  }
   
-  res.status(201).json({
-    status: 'success'
-  })
 });
 
 // POST login user
@@ -86,10 +88,12 @@ exports.login = catchAsync(async (req, res, next) => {
       error,
     })
   }
+  else {
+    res.status(201).json({
+      status: 'success'
+    })
+  }
   
-  res.status(201).json({
-    status: 'success'
-  })
   // Validate that the user login info matches an instance in the database
   /* YOUR CODE HERE */
 
