@@ -112,3 +112,5 @@ const isRule = (obj) => {
     obj.hasOwnProperty("value")
   );
 };
+
+module.exports.isRule = isRule;
