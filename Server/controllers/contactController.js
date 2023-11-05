@@ -4,19 +4,21 @@ const nodemailer = require('nodemailer');
 exports.sendContactFormInfo = catchAsync(async (req, res, next) => {
 
 
-    const contactInfo = req.query;
-    // Send an email to Link Health via contact form with info in the req object using nodemailer
-
-        /*
-
     req.query = {
         firstName: string,
         lastName: string,
         email: string,
         message: string,
     }
+    
+    const contactInfo = req.query;
+    // Send an email to Link Health via contact form with info in the req object using nodemailer
 
-    */
+        
+
+
+
+
    
     async function main(){
 
@@ -25,19 +27,19 @@ exports.sendContactFormInfo = catchAsync(async (req, res, next) => {
             port: 465,
             secure: true,
             auth: {
-                user: 'aayushpatel27@gmail.com',
-                pass: '...'
+                user: 'linkhealthdummy@gmail.com',
+                pass: 'linkhealthdummy123'
             }
 
         });
 
         const info = await transporter.sendMail({
-            from: 'test <aayushpatel27@gmail.com>',
-            to: 'test' <'aayushpatel27@gmail.com',
+            from: 'test <linkhealthdummy@gmail.com>',
+            to: 'test <linkhealthdummy@gmail.com>',
 
-            subject: 'testing testing testing', //should be some string constructed from req
-            text: 'text', //some version of req/res
-            html: html
+            subject: `${contactInfo.firstName} ${contactInfo.lastName} linkhealth message`, //should be some string constructed from req
+            text: `${contactInfo.message}`, //some version of req/res
+            // html: html
         })
 
         console.log("message sent" + info.messageID);
