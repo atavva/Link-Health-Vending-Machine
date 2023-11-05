@@ -1,20 +1,38 @@
-## Developing
+# create-svelte
 
-To run the app first run 
+Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+
+## Creating a project
+
+If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
-npm install
-npm run build
-npm run dev --open
+# create a new project in the current directory
+npm create svelte@latest
+
+# create a new project in my-app
+npm create svelte@latest my-app
 ```
 
-## Links
-Project Link [Page](https://github.com/users/TheArctesian/projects/3/views/1)
+## Developing
 
-- Use this to find out what tasks need to be done and organisation of tasks 
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-[Figma](https://www.figma.com/file/fJFQB9ozOzTHLf9uRIFkPo/Linked-in-Frontend?type=design&node-id=0%3A1&mode=design&t=FE5C41eiTdVwPKBM-1) for design and style sheet
+```bash
+npm run dev
 
-[Sveltekit Docs](https://kit.svelte.dev/docs/introduction) for learning how to use sveltekit
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
+```
 
-This project uses typescript because I don't want to write tests
+## Building
+
+To create a production version of your app:
+
+```bash
+npm run build
+```
+
+You can preview the production build with `npm run preview`.
+
+> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
