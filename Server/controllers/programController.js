@@ -1,22 +1,11 @@
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
-const determineEligibilityForAllPrograms = require("../utils/determineEligibilty");
-
-const { createClient } = require("@supabase/supabase-js");
-
-// Initialize the Supabase client
-const supabase = createClient(
-  "https://juhxzbhlztuqtxwkpavi.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1aHh6YmhsenR1cXR4d2twYXZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTY4MDk2NzYsImV4cCI6MjAxMjM4NTY3Nn0.MVDY_Ofxgtmt_CnsVD0Z_yb40oYk53Kdfh5kbH5QSk0"
-);
+const determineEligibilityForAllPrograms = require("../utils/determineEligibility");
+const supabase = require("../utils/client");
 
 const allPrograms = async () => {
   // Utility function
   // RETURNS: List of all the programs in the database
-  // Return type: Program[]
-  /* YOUR CODE HERE */
-
-  /*DUMMY CODE*/
 
   let { data: programs, error } = await supabase.from("programs").select("*");
 
@@ -61,15 +50,22 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 exports.getProgramById = catchAsync(async (req, res, next) => {
   // Get the requested ID
   const id = req.params.id;
-
+  const programs = await allPrograms();
   // Filter the programs to the existing ID
   /* YOUR CODE HERE */
-
+  const program = programs.find((program) => program.program_id == id);
   // Raise an error if that program doesn't exist
   /* YOUR CODE HERE */
+  if (!program) {
+    return next(new AppError("Program not found", 404));
+  }
 
   // Send the program back
   /* YOUR CODE HERE */
+  res.status(200).json({
+    status: "success",
+    data: program,
+  });
 });
 
 // POST request to register for a program
@@ -80,7 +76,11 @@ exports.registerForProgram = catchAsync(async (req, res, next) => {
 
   // Raise a status code 400 Bad Request error if we don't have a handler function for that program
   /* YOUR CODE HERE */
-
+  if (!program.handlerFunction) {
+    return next(new AppError("No handler function for this program", 400));
+  }
   // Pass in the necessary information to the program handler function and send a success response if successful
   /* YOUR CODE HERE */
 });
+
+exports.allPrograms = allPrograms;

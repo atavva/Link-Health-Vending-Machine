@@ -8,6 +8,7 @@ module.exports = (eligibility, programs) => {
   if (Object.keys(eligibility).length === 0) {
     return programs;
   }
+
   // Run a filter using determineEligibility for each program
   const eligiblePrograms = programs.filter((program) =>
     determineEligibility(eligibility, program.eligibility)
@@ -53,7 +54,7 @@ const evaluateRule = (eligibility, rule) => {
   // Check eligibility by case
   switch (rule.comparisonOperator) {
     case "=":
-      return userVal == rule.value;
+      return userVal == String(rule.value);
     case "<=":
       return userVal <= rule.value;
     case ">=":
@@ -79,8 +80,6 @@ const evaluateEligibilityRequirement = (
 ) => {
   // Check if the condition is 'AND' or 'OR'-- use any or all appropriately
   const returnOnVal = eligibilityRequirement.condition === "OR";
-  console.log(returnOnVal);
-  console.log(eligibilityRequirement);
 
   for (let i = 0; i < eligibilityRequirement.rules.length; i++) {
     const currCondition = eligibilityRequirement.rules[i];
@@ -113,3 +112,5 @@ const isRule = (obj) => {
     obj.hasOwnProperty("value")
   );
 };
+
+module.exports.isRule = isRule;
