@@ -114,3 +114,4 @@ const isRule = (obj) => {
 };
 
 module.exports.isRule = isRule;
+module.exports.evaluateRule = evaluateRule;

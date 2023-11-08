@@ -1,3 +1,5 @@
+const { evaluateRule } = require('./determineEligibility');
+
 /**
  * Fixes nesting on unknownPrograms by iterating through and removing redundacies
  * @param {Program[]} unknownPrograms
@@ -10,18 +12,26 @@ const fixProgramNesting = (unknownPrograms, eligibility) => {
 }
     
 const removeEligibility = (eligibility_lst, eligibility, cond = 'OR', out = []) => {
-    for (i in eligibility_lst) {
-        if (eligibility_lst[i]['condition'] == 'AND') {
+    for (let i = 0; i < eligibility_lst.length; i++) {
+        const currEl = eligibility_lst[i]
+        const condition = currEl['condition'];
+        if (condition == 'AND') {
             out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'AND', out)) //if gets to new nested lst AND 
         } 
-        if (eligibility_lst[i]['condition'] == 'OR') {
+        if (condition == 'OR') {
             out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'OR', out)) //if gets to new nested lst OR 
         } 
-        if ((eligibility_lst[i]['fieldName'] != eligibility) && (cond == 'OR')) {
-            out.push(eligibility_lst[i])
+
+        const fieldName = currEl['fieldName']
+        if ((fieldName in Object.keys(eligibility)) && (cond == 'OR')) {
+            const ruleIsTrue = evaluateRule(currEl, eligibility);
+            if (ruleIsTrue) {
+
+            }
+            out.push(currEl)
         }
         //if fails an AND statement everything nested after this doesnt count right?????
-        if ((eligibility_lst[i]['fieldName'] == eligibility) && (cond == 'AND')) {
+        if ((fieldName == eligibility) && (cond == 'AND')) {
             return out
         }
         

@@ -26,6 +26,7 @@ const evaluateBestQuestion = (cleanedPrograms) => {
     });
   }
 
+  console.log(currScores);
   return findKeyWithHighestValue(currScores);
 };
 
