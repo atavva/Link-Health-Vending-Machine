@@ -5,9 +5,32 @@
  * @returns {Program[]} programs with fixes 'rules' lists
  */
 const fixProgramNesting = (unknownPrograms, eligibility) => {
+    eligibility_lst = unknownPrograms[0]['eligibility'][0]['rules']
+    return removeEligibility(eligibility_lst, eligibility)
+}
+    
+const removeEligibility = (eligibility_lst, eligibility, cond = 'OR', out = []) => {
+    for (i in eligibility_lst) {
+        if (eligibility_lst[i]['condition'] == 'AND') {
+            out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'AND', out)) //if gets to new nested lst AND 
+        } 
+        if (eligibility_lst[i]['condition'] == 'OR') {
+            out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'OR', out)) //if gets to new nested lst OR 
+        } 
+        if ((eligibility_lst[i]['fieldName'] != eligibility) && (cond == 'OR')) {
+            out.push(eligibility_lst[i])
+        }
+        //if fails an AND statement everything nested after this doesnt count right?????
+        if ((eligibility_lst[i]['fieldName'] == eligibility) && (cond == 'AND')) {
+            return out
+        }
+        
+    }
+    return out  //gets out of for loop without function call aka reached end of eligibility lst
+    
+}
   // If eligibility is an empty object, return unknownPrograms
   // If an eligibility in userEligibility appears in a "rule" object for unknownPrograms, eliminate it
-};
 
 /*
 
@@ -146,5 +169,9 @@ expected output:
     The function eliminates "agi" from the initial OR as the individual doesn't qualify. It also moves "veteran" up
     as it knows the agi is indeed less than 40000. The "AND" between "age" and "disability" is also moved up for the same reason.
     Additionally, it eliminated "active_duty" as it figured out it wasn't eligible
+
+    notes:
+    - ^^ moving up?? if it is being stored as a list I am thinking I will just delete it and it will 
+    then be moved it 
 
 */
