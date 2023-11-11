@@ -45,7 +45,7 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 // POST signup user
 exports.signup = catchAsync(async (req, res, next) => {
   // Get the info about the user
-  const newUserInfo = req.query;
+  const newUserInfo = req.body;
 
   // Sign the user up
   // THIS IS BAD AND ONLY FOR TESTING DEAR GOD DONT KEEP THIS
@@ -73,9 +73,9 @@ exports.signup = catchAsync(async (req, res, next) => {
 // POST login user
 exports.login = catchAsync(async (req, res, next) => {
   // Get the info about the user who is trying to log in
-  const userInfo = req.query;
+  const userInfo = req.body;
 
-  const { data, error } =await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email : userInfo['email'],
     password : userInfo['password']
   })

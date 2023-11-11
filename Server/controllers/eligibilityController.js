@@ -43,7 +43,7 @@ exports.determineNextQuestion = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      ...questionInfo,
+      ...questionInfo[0],
     },
   });
 });
