@@ -1,5 +1,6 @@
 // Imports
 const express = require("express");
+const cors = require('cors');
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const cors = require('cors');
@@ -12,6 +13,7 @@ const eligibilityRouter = require("./routers/eligibilityRouter");
 const app = express();
 
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", userRouter);
