@@ -10,11 +10,13 @@ const allUsers = async () => {
   /* YOUR CODE HERE */
 };
 
-exports.verifyUser = (userInfo) => {
+exports.verifyUser = catchAsync(async (req, res, next) => {
   // Utility function
   // Verifies the user is logged in
   // May need more params/to be adjusted, I didn't really think this one through
-};
+  console.log("User is verified!");
+  next();
+});
 
 // GET user by ID or users by AdminID
 exports.getUserById = catchAsync(async (req, res, next) => {
@@ -54,15 +56,22 @@ exports.signup = catchAsync(async (req, res, next) => {
     password : newUserInfo['password']
   })
 
-  console.log(data, error)
-
   if (error) {
     res.status(error["status"]).json({
       status: 'fail',
       error,
-    })
+    });
   }
+
   else {
+    const jwtToken = data.session.access_token;
+
+    res.cookie('jwt', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7200000
+    });
+
     res.status(201).json({
       status: 'success'
     })
@@ -80,8 +89,6 @@ exports.login = catchAsync(async (req, res, next) => {
     password : userInfo['password']
   })
   
-  console.log(data, error);
-
   if (error) {
     res.status(error["status"]).json({
       status: 'fail',
@@ -89,6 +96,14 @@ exports.login = catchAsync(async (req, res, next) => {
     })
   }
   else {
+    const jwtToken = data.session.access_token;
+
+    res.cookie('jwt', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 7200000
+    });
+
     res.status(201).json({
       status: 'success'
     })
