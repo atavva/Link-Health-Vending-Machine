@@ -1,6 +1,5 @@
 // Imports
 const express = require("express");
-const cors = require('cors');
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const cors = require('cors');
