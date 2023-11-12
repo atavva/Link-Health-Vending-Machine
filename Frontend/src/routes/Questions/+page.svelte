@@ -1,7 +1,19 @@
 <script>
   import { onMount } from 'svelte';
-  let question = null;
+	import { Stepper, Step } from '@skeletonlabs/skeleton';
+	let dataE = {
+		Question: 'Hello World',
+		Answered: 0
+	};
+    let dataA = { 
+		Question: 'buebue bue',
+		Answered: "lorem upsium"
+	
+    }
+	let data = [dataE, dataE, dataA];
 
+
+  let question = null;
   async function getNextQuestion() {
     const response = await fetch('http://127.0.0.1:3000/api/eligibility', {
       method: 'POST',
@@ -24,6 +36,7 @@
   }
 
   onMount(getNextQuestion);
+
 </script>
 
 {#if question}
@@ -33,3 +46,13 @@
 {:else}
   <p>Loading next question...</p>
 {/if}
+
+<!-- This is only an example we will have to fully integrate this as we go on -->
+<Stepper>
+	{#each data as d}
+		<Step>
+			<svelte:fragment slot="header">{d.Question}</svelte:fragment>
+			{d.Answered}
+		</Step>
+	{/each}
+</Stepper>
