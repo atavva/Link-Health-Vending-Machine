@@ -14,6 +14,8 @@ const allPrograms = async () => {
   /*END DUMMY CODE*/
 };
 
+module.exports.allPrograms = allPrograms;
+
 // GET request for all programs, with an optional req.query
 exports.getAllPrograms = catchAsync(async (req, res, next) => {
   // Get all the programs from the database
