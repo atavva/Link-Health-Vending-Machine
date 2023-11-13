@@ -1,7 +1,7 @@
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const supabase = require("../utils/client");
-
+const { createClient } = require("@supabase/supabase-js");
 
 const allUsers = async () => {
   // Utility function
@@ -10,12 +10,66 @@ const allUsers = async () => {
   /* YOUR CODE HERE */
 };
 
+const createAuthClient = (auth) => {
+  try{
+    const client = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_PUBLIC_ANON_KEY,
+      {
+        db: {
+          schema:'public',
+        },
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+        global: {
+          headers: auth? {
+            Authorization: auth,
+          } : null,
+        }
+      }
+    );
+
+    return client;
+  } catch {
+    return null;
+  }
+
+};
+
 exports.verifyUser = catchAsync(async (req, res, next) => {
   // Utility function
   // Verifies the user is logged in
   // May need more params/to be adjusted, I didn't really think this one through
-  console.log("User is verified!");
   next();
+});
+
+exports.getUser = catchAsync(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  const supabase = createAuthClient(authHeader);
+
+  if (!supabase) {
+    res.status(401).json({
+      status: 'fail',
+      error: 'JWT failure - invalid JWT'
+    });
+  }
+
+  const { data, error } = await supabase.from("profiles").select("*");
+
+  if (error) {
+    res.status(404).json({
+      status: "fail",
+      error,
+    });
+  }
+
+  res.status(200).json({
+    status: "success",
+    data,
+  });
 });
 
 // GET user by ID or users by AdminID
@@ -29,18 +83,18 @@ exports.getUserById = catchAsync(async (req, res, next) => {
 
   // If they are not an admin:
   if (!isAdmin) {
-  //    Send back the information on the single user with success status code 200
-  /*    YOUR CODE HERE */
-    res.status(200).json({user})
+    //    Send back the information on the single user with success status code 200
+    /*    YOUR CODE HERE */
+    res.status(200).json({ user });
   }
   // If they are an admin:
   else {
-  //    Segment the data to get (total users / total admin users) users (we can figure this out later)
-  /*    YOUR CODE HERE */
+    //    Segment the data to get (total users / total admin users) users (we can figure this out later)
+    /*    YOUR CODE HERE */
 
-  //    Send back the information on the multiple users with success status code 200
-  /*    YOUR CODE HERE */
-    res.status(200).json({allUsers})
+    //    Send back the information on the multiple users with success status code 200
+    /*    YOUR CODE HERE */
+    res.status(200).json({ allUsers });
   }
 });
 
@@ -51,32 +105,53 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   // Sign the user up
   // THIS IS BAD AND ONLY FOR TESTING DEAR GOD DONT KEEP THIS
-  const { data, error } = await supabase.auth.signUp({
-    email : newUserInfo['email'],
-    password : newUserInfo['password']
-  })
+  const { data, error: signUpError } = await supabase.auth.signUp({
+    email: newUserInfo["email"],
+    password: newUserInfo["password"],
+  });
 
-  if (error) {
+  if (signUpError) {
     res.status(error["status"]).json({
-      status: 'fail',
+      status: "fail",
       error,
     });
   }
 
-  else {
-    const jwtToken = data.session.access_token;
+  const serviceRoleClient = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
-    res.cookie('jwt', jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7200000
+  const uid = data.user.id;
+
+  const { error: profileError } = await serviceRoleClient
+    .from("profiles")
+    .insert({
+      id: uid,
+      user_id: uid,
+      role: "user",
+      eligibility: {},
+      eligible_programs: [],
     });
 
-    res.status(201).json({
-      status: 'success'
-    })
+  if (profileError) {
+    res.status(500).json({
+      status: "fail",
+      profileError,
+    });
   }
-  
+
+  const jwtToken = data.session.access_token;
+
+  res.cookie("jwt", jwtToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7200000,
+  });
+
+  res.status(201).json({
+    status: "success",
+  });
 });
 
 // POST login user
@@ -85,30 +160,29 @@ exports.login = catchAsync(async (req, res, next) => {
   const userInfo = req.body;
 
   const { data, error } = await supabase.auth.signInWithPassword({
-    email : userInfo['email'],
-    password : userInfo['password']
-  })
-  
+    email: userInfo["email"],
+    password: userInfo["password"],
+  });
+
   if (error) {
     res.status(error["status"]).json({
-      status: 'fail',
+      status: "fail",
       error,
-    })
-  }
-  else {
+    });
+  } else {
     const jwtToken = data.session.access_token;
 
-    res.cookie('jwt', jwtToken, {
+    res.cookie("jwt", jwtToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7200000
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7200000,
     });
 
     res.status(201).json({
-      status: 'success'
-    })
+      status: "success",
+    });
   }
-  
+
   // Validate that the user login info matches an instance in the database
   /* YOUR CODE HERE */
 
@@ -124,11 +198,11 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   // Verify the user is logged in, and get their user ID from JWT
   /* YOUR CODE HERE */
 
-  //const decoded = jwt.verify(token, config.get('jwtPrivateKey'));  
-  //var userId = decoded.id 
+  //const decoded = jwt.verify(token, config.get('jwtPrivateKey'));
+  //var userId = decoded.id
   //idk which one works
 
-  const token = req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization.split(" ")[1];
   const decoded = await verifyToken(token);
   const userId = decoded.id;
 
@@ -136,15 +210,15 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     const user = User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     if (user.isAdmin || user._id.toString() === userId) {
-      User.findByIdAndRemove(userId)
-      return res.status(204).json(); 
+      User.findByIdAndRemove(userId);
+      return res.status(204).json();
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: "Internal server error" });
   }
   // Delete the user from the database
   /* YOUR CODE HERE */
@@ -154,7 +228,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 exports.patchUser = catchAsync(async (req, res, next) => {
   // Verify the user is logged in, and get their user ID from JWT
   /* YOUR CODE HERE */
-  const token = req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization.split(" ")[1];
   const decoded = await verifyToken(token);
   const userId = decoded.id;
 
@@ -167,7 +241,7 @@ exports.patchUser = catchAsync(async (req, res, next) => {
     const user = User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     if (user._id.toString() === userId) {
@@ -175,9 +249,11 @@ exports.patchUser = catchAsync(async (req, res, next) => {
       user.save();
       return res.status(200).json({ user });
     } else {
-      return res.status(403).json({ message: 'Unauthorized to update this user' });
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to update this user" });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: "Internal server error" });
   }
 });
