@@ -1,8 +1,15 @@
 const { isRule, evaluateRule } = require("./determineEligibility");
 
 module.exports = (unknownPrograms, eligibility) => {
-  //clean the programs
-  // const cleanedPrograms = cleanPrograms(unknownPrograms, eligibility);
+  
+  //Eliminate Null values from eligibility
+  Object.keys(eligibility).forEach((key) => {
+    if (eligibility[key] == null) {
+      delete eligibility[key];
+    }
+  });
+
+  //Clean the programs
   const cleanedPrograms = simplifyPrograms(unknownPrograms, eligibility);
 
   const finalPrograms = [];
@@ -45,9 +52,7 @@ const evaluateBestQuestion = (cleanedPrograms) => {
     });
   }
 
-  console.log(currScores);
-
-  return findKeyWithHighestValue(currScores);
+  return currScores;
 };
 
 const findKeyWithHighestValue = (obj) => {
@@ -65,6 +70,8 @@ const findKeyWithHighestValue = (obj) => {
 
   return maxKey;
 };
+
+module.exports.findKeyWithHighestValue = findKeyWithHighestValue;
 
 /**
  * Determines the value of each eligibility info in an eligibility requirement
