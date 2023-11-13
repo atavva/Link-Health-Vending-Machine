@@ -1,8 +1,8 @@
 const express = require("express");
-const { determineNextQuestion } = require("../controllers/eligibilityController");
+const { determineNextQuestion, getFieldNames } = require("../controllers/eligibilityController");
 
 const router = express.Router();
 
-router.route("/").post(determineNextQuestion);
+router.route("/").get(getFieldNames).post(determineNextQuestion);
 
 module.exports = router;

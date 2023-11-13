@@ -305,10 +305,14 @@ POST /api/eligibility
 Content-Type: application/json
 
 {
-    "eligiblePrograms": [1, 3], // List of program IDs
-    "ineligiblePrograms": [2, 7], // List of program IDs
-    "eligibility": { // User eligibility info
+    "eligiblePrograms": [],
+    "ineligiblePrograms": [],
+    "eligibility": {
         "agi": 35000,
+        "age": null,
+        "snap": null,
+        "dependents": null,
+        ...fieldNames: null // The rest of the Field Names as null
     }
 }
 ```
@@ -319,14 +323,60 @@ Content-Type: application/json
 {
     "status": "success",
     "data": {
-        "id": 6,
-        "created_at": "2023-11-11T20:04:26.739695+00:00",
-        "Field Name": "age",
-        "Question": "What is your current age?",
-        "Expected Type": "Number"
+        "questionInfo": {
+            "id": 6,
+            "created_at": "2023-11-11T20:04:26.739695+00:00",
+            "Field Name": "age", // The field name to edit in the locally stored eligibility object
+            "Question": "What is your current age?", // The question to ask the user
+            "Expected Type": "Number" // The expected type (it's a number here)
+        },
+        "maxRemainingQuestions": 5, // How many questions are remaining at a maximum
+        "percentageCompleted": 0.16666666666666666 // The minimum percentage of questions completed (for a progress bar)
     }
 }
 ```
+
+When maxRemainingQuestions = 0, call `GET /api/programs/{userEligibility}` to determine eligible programs - the questions have finished
+
+#### `"Expected Type" Definitions`
+| "Expected Type" | Definition |
+| --- | --- |
+| "Number" | We are expecting a number
+| "Range a-b" | We are expecting a number in the range from a to b |
+| "Boolean" | We are expecting a true or false value (yes or no) |
+| "Option a\|b\|c\|d" | We are expecting one of the values as a string, separated by a \|, in this case, a, b, c, or d |
+| "String" | We are expecting a string of any value |
+
+### <span style="color:lightgreen">Get Field Names (Implemented)</span>
+
+| Info             | Description                                                                                                           |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/eligibility`                                                                                                    |
+| **Method**       | `GET`                                                                                                                |
+| **Description**  | Returns a list of user 'eligbility' field names to use in ts definitions |
+| **Request Info** | None |
+
+#### Request
+
+```
+POST /api/eligibility
+```
+#### Response
+
+```
+{
+    "status": "success",
+    "data": {
+        "fieldNames": [
+            "agi",
+            "dependents",
+            "snap",
+            ...fieldNames //The rest of the field names in the DB        
+        ]
+    }
+}
+```
+
 
 ## Contact
 
@@ -363,4 +413,3 @@ Status Code: 200
     status: 'success'
 }
 ```
-
