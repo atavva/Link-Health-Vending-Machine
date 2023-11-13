@@ -5,12 +5,9 @@
 // Passowrd Strentgh 
 // Repeate 
 </script>
+
 <div class="h-screen flex justify-center items-center">
 	<form class="h-fit w-fit m-4 card p-8 text-token space-y-4" use:focusTrap={isFocused}>
-		<label class="label">
-			<span>Name</span>
-			<input class="input" type="text" placeholder="Enter name..." />
-		</label>
 		<label class="label">
 			<span>Email</span>
 			<input class="input" type="email" placeholder="Enter email address..." />
@@ -20,8 +17,7 @@
 			<input class="input" type="password" placeholder="Enter password..." />
 		</label>
 		<div class="text-center">
-			<button class="btn variant-filled">Sign Up</button>
+			<button class="btn variant-filled">Sign In</button>
 		</div>
 	</form>
 </div>
-

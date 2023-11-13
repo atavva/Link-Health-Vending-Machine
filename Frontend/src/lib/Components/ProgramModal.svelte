@@ -1,4 +1,5 @@
 <script lang="ts">
+    export let ProgramTitle = ""
 /*
     This file will contain the modal (popup) for The program with it's deatails
     It should display 
