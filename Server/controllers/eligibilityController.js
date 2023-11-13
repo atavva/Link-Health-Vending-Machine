@@ -7,22 +7,24 @@ const { findKeyWithHighestValue } = require("../utils/determineNextQuestion");
 const { allPrograms } = require("./programController");
 
 exports.getFieldNames = catchAsync(async (req, res, next) => {
-  const { data, error } = await supabase.from('eligibility').select('"Field Name"');
+  const { data, error } = await supabase
+    .from("eligibility")
+    .select('"Field Name"');
 
   if (error) {
     return next(new AppError(error.message, error.code));
   }
 
-  const fieldNames = []
+  const fieldNames = [];
   data.forEach((el) => {
     fieldNames.push(el["Field Name"]);
   });
 
   res.status(200).json({
-    status: 'success',
-    fieldNames
-  })
-})
+    status: "success",
+    data: { fieldNames },
+  });
+});
 /**
  * Determines the best next question to ask a user to efficiently determine their eligibility
  */
@@ -69,18 +71,22 @@ exports.determineNextQuestion = catchAsync(async (req, res, next) => {
     );
   }
 
-  const { data: totalCountData, error: totalCountError } = await supabase.from("eligibility").select("count");
-
-  const totalQuestions = totalCountData[0].count || NaN; 
-
-  const { data: remainingQuestionData, error: remainingQuestionError } = await supabase
+  const { data: totalCountData, error: totalCountError } = await supabase
     .from("eligibility")
-    .select('count')
-    .in("Field Name", Object.keys(bestNextEligibilityScores));
+    .select("count");
+
+  const totalQuestions = totalCountData[0].count || NaN;
+
+  const { data: remainingQuestionData, error: remainingQuestionError } =
+    await supabase
+      .from("eligibility")
+      .select("count")
+      .in("Field Name", Object.keys(bestNextEligibilityScores));
 
   const maxRemainingQuestions = remainingQuestionData[0].count || NaN;
 
-  const percentageCompleted = (totalQuestions - maxRemainingQuestions) / totalQuestions;
+  const percentageCompleted =
+    (totalQuestions - maxRemainingQuestions) / totalQuestions;
 
   res.status(200).json({
     status: "success",
