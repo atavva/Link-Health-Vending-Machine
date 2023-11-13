@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
+	import Loading from '$lib/Components/Loading.svelte';
 	let programs = null;
 
 	onMount(async () => {
@@ -37,7 +38,5 @@
 		{/each}
 	</div>
 {:else}
-	<div class="h-screen flex flex-col justify-center items-center">
-		<ProgressRadial />
-	</div>
+<Loading></Loading>
 {/if}

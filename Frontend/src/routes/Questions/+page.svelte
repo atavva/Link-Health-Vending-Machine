@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import Loading from '$lib/Components/Loading.svelte';
 	import { Stepper, Step, ProgressBar, ProgressRadial } from '@skeletonlabs/skeleton';
 	let dataE = {
 		Question: 'Hello World',
@@ -45,7 +46,7 @@
 	onMount(getNextQuestion);
 </script>
 
-<div class="h-screen flex flex-col justify-center items-center">
+<div class="h-full flex flex-col justify-center items-center">
 	{#if question}
 		<div class="m-4 card p-8 text-token space-y-4">
 			<h1>{question.Question}</h1>
@@ -60,6 +61,6 @@
 			/>
 		</div>
 	{:else}
-		<ProgressRadial />
+		<Loading />
 	{/if}
 </div>
