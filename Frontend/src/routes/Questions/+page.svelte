@@ -12,8 +12,14 @@
     }
 	let data = [dataE, dataE, dataA];
 
+  let questionsAsked = 0
+
+  function updateQuestion(){
+    questionsAsked += 1
+  }
 
   let question = null;
+// Total Max question is 0 -> USer page
   async function getNextQuestion() {
     const response = await fetch('http://127.0.0.1:3000/api/eligibility', {
       method: 'POST',
@@ -21,8 +27,8 @@
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        eligiblePrograms: [1, 3], // List of program IDs
-        ineligiblePrograms: [2, 7], // List of program IDs
+        eligiblePrograms: [], // List of program IDs
+        ineligiblePrograms: [], // List of program IDs
         eligibility: { // User eligibility info
             agi: 35000,
         }
