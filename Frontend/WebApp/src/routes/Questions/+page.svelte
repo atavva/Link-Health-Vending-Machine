@@ -4,6 +4,8 @@
 	import Loading from '$lib/Components/Loading.svelte';
 	import { Stepper, Step, ProgressBar, ProgressRadial } from '@skeletonlabs/skeleton';
 	let question = null;
+	let questionsAsked = 0;
+	let questionsRemaining = 0;
 	// Total Max question is 0 -> USer page
 	async function getNextQuestion() {
 		const response = await fetch(API_URL + '/eligibility', {
