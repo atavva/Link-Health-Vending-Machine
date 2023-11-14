@@ -1,6 +1,1 @@
-const API_URL = ""
-let programs = []
-function getPrograms(){
-    fetch(API_URL + "api/x")
-    .then(response=>response.json)
-}
+export const API_URL = "http://127.0.0.1:3000/api"

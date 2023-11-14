@@ -1,28 +1,12 @@
 <script>
 	import { onMount } from 'svelte';
+  import { API_URL } from '$lib/api';
 	import Loading from '$lib/Components/Loading.svelte';
 	import { Stepper, Step, ProgressBar, ProgressRadial } from '@skeletonlabs/skeleton';
-	let dataE = {
-		Question: 'Hello World',
-		Answered: 0
-	};
-	let dataA = {
-		Question: 'buebue bue',
-		Answered: 'lorem upsium'
-	};
-	let data = [dataE, dataE, dataA];
-
-	let questionsAsked = 0;
-	let questionsRemaining = 10;
-
-	function updateQuestion() {
-		questionsAsked += 1;
-	}
-
 	let question = null;
 	// Total Max question is 0 -> USer page
 	async function getNextQuestion() {
-		const response = await fetch('http://127.0.0.1:3000/api/eligibility', {
+		const response = await fetch(API_URL + '/eligibility', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
