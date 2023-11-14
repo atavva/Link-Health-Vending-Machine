@@ -319,6 +319,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   res.status(201).json({
     status: "success",
+    jwt: jwtToken,
   });
 });
 
@@ -690,10 +691,12 @@ exports.login = catchAsync(async (req, res, next) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 7200000,
+      path: "/",
     });
 
     res.status(201).json({
       status: "success",
+      jwt: jwtToken,
     });
   }
 });
