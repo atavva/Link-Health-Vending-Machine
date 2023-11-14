@@ -26,6 +26,7 @@
 		if (response.ok) {
 			const result = await response.json();
 			question = result.data;
+			console.log(result)
 		}
 	}
 
@@ -38,7 +39,7 @@
 			<h1>{question.Question}</h1>
 			<p>Field Name: {question['Field Name']}</p>
 			<p>Expected Type: {question['Expected Type']}</p>
-			<button on:click={updateQuestion}>Update</button>
+			<button on:click={getNextQuestion}>Update</button>
 			<ProgressBar
 				transition="transition-all"
 				label="Progress Bar"
