@@ -8,36 +8,49 @@ const { evaluateRule } = require('./determineEligibility');
  */
 const fixProgramNesting = (unknownPrograms, eligibility) => {
     eligibility_lst = unknownPrograms[0]['eligibility'][0]['rules']
-    return removeEligibility(eligibility_lst, eligibility)
+    cond = unknownPrograms[0]['eligibility'][0]['condition']
+    let newUnkownPrograms = {}
+    for (let i = 0; i < eligibility.length; i++) {
+        removedOne = removeEligibility(eligibility_lst, eligibility[i], cond, newUnkownPrograms)
+        newUnkownPrograms = removedOne
+    }
+    newUnkownPrograms = {...unknownPrograms[0]['eligibility'][0], newUnkownPrograms}
+    return unknownPrograms
 }
     
-const removeEligibility = (eligibility_lst, eligibility, cond = 'OR', out = []) => {
+const removeEligibility = (eligibility_lst, eligibility, cond, out) => {
     for (let i = 0; i < eligibility_lst.length; i++) {
         const currEl = eligibility_lst[i]
         const condition = currEl['condition'];
         if (condition == 'AND') {
-            out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'AND', out)) //if gets to new nested lst AND 
+            x = removeEligibility(eligibility_lst[i]['rules'], eligibility, 'AND', out)
+            out = {...out, 'condition': cond, 'rules' : x} //if gets to new nested lst AND 
         } 
         if (condition == 'OR') {
-            out.push(removeEligibility(eligibility_lst[i]['rules'], eligibility, 'OR', out)) //if gets to new nested lst OR 
+            x = removeEligibility(eligibility_lst[i]['rules'], eligibility, 'OR', out)
+            out = {...out, 'condition': cond, 'rules' : x} //if gets to new nested lst OR 
         } 
 
         const fieldName = currEl['fieldName']
-        if ((fieldName in Object.keys(eligibility)) && (cond == 'OR')) {
+        if ((fieldName in Object.keys(eligibility)) && (cond == 'OR')){
             const ruleIsTrue = evaluateRule(currEl, eligibility);
-            if (ruleIsTrue) {
-
-            }
-            out.push(currEl)
+            //if (!ruleIsTrue) { //keep it but get rid of rest
+            
+             //} //if false do nothing so that not added to the main lst
+        } else { //eligibilities that are not being evaluated
+            out = {...out, currE1}
         }
+        
         //if fails an AND statement everything nested after this doesnt count right?????
-        if ((fieldName == eligibility) && (cond == 'AND')) {
-            return out
+        if ((fieldName in Object.keys(eligibility)) && (cond == 'AND')) {
+            const ruleIsTrue = evaluateRule(currEl, eligibility);
+            if (!ruleIsTrue) { //if it does not pass the requirments then do not add rest of portion of lst
+                return out
+            }
         }
         
     }
     return out  //gets out of for loop without function call aka reached end of eligibility lst
-    
 }
   // If eligibility is an empty object, return unknownPrograms
   // If an eligibility in userEligibility appears in a "rule" object for unknownPrograms, eliminate it
