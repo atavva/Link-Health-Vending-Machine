@@ -15,14 +15,14 @@ exports.getFieldNames = catchAsync(async (req, res, next) => {
     return next(new AppError(error.message, error.code));
   }
 
-  const fieldNames = [];
+  const eligibility = {};
   data.forEach((el) => {
-    fieldNames.push(el["Field Name"]);
+    eligibility[el["Field Name"]] = null;
   });
 
   res.status(200).json({
     status: "success",
-    data: { fieldNames },
+    data: { eligibility },
   });
 });
 /**
