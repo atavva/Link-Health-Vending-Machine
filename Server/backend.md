@@ -735,13 +735,31 @@ When maxRemainingQuestions = 0, call `GET /api/programs/{userEligibility}` to de
 | ---------------- | ------------------------------------------------------------------------ |
 | **Route**        | `/api/eligibility`                                                       |
 | **Method**       | `GET`                                                                    |
-| **Description**  | Returns a list of user 'eligbility' field names to use in ts definitions |
+| **Description**  | Returns an empty user eligibilty object with all field names set to null |
 | **Request Info** | None                                                                     |
 
 #### Request
 
 ```
-POST /api/eligibility
+GET /api/eligibility
+```
+
+```
+Status Code: 200
+
+{
+    "status": "success",
+    "data": {
+        "eligibility": {
+            "agi": null,
+            "dependents": null,
+            "snap": null,
+            "poverty_level": null,
+            "filing_status": null,
+            "age": null
+        }
+    }
+}
 ```
 
 #### Response
@@ -799,7 +817,9 @@ Status Code: 200
 ## Auth Errors
 
 #### Authentication Error
+
 Sent when no JWT is sent to the server - the user is not logged in
+
 ```
 Status Code: 401
 
@@ -811,6 +831,7 @@ Status Code: 401
 ```
 
 #### Expired Session Error
+
 Sent when the user's session has expired - the user needs to log in again
 
 ```
@@ -824,6 +845,7 @@ Status Code: 401
 ```
 
 #### Invalid Session Error
+
 Sent when the user's JWT is invalid and could not be verified by the server - the user needs to log in again
 
 ```
@@ -837,6 +859,7 @@ Status Code: 401
 ```
 
 #### Forbidden Route Error
+
 Sent when a normal user tries to access an admin-protected route
 
 ```
@@ -847,5 +870,3 @@ Status Code: 403
     message: "You must be an administrator to access this resource",
 }
 ```
-
-
