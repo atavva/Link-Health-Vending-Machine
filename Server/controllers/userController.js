@@ -326,7 +326,9 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   res.cookie("jwt", jwtToken, options); */
 
-  res.set({ "Set-Cookie": `jwt=${jwtToken}; HttpOnly; Secure; SameSite='None'; Max-Age=7200000` });
+  res.set({
+    "Set-Cookie": `jwt=${jwtToken}; HttpOnly; Secure; SameSite='None'; Max-Age=7200000`,
+  });
 
   if (process.env.NODE_ENV == "development") {
     res.status(201).json({
@@ -335,10 +337,9 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
   } else {
     res.status(201).json({
-      status: 'success',
+      status: "success",
     });
   }
-
 });
 
 exports.patchEligibility = catchAsync(async (req, res, next) => {
@@ -709,17 +710,20 @@ exports.login = catchAsync(async (req, res, next) => {
   } else {
     const jwtToken = data.session.access_token;
 
-    res.cookie("jwt", jwtToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7200000,
-      path: "/",
+    res.set({
+      "Set-Cookie": `jwt=${jwtToken}; HttpOnly; Secure; SameSite=None; Max-Age=7200000`,
     });
 
-    res.status(201).json({
-      status: "success",
-      jwt: jwtToken,
-    });
+    if (process.env.NODE_ENV == "development") {
+      res.status(201).json({
+        status: "success",
+        jwt: jwtToken,
+      });
+    } else {
+      res.status(201).json({
+        status: "success",
+      });
+    }
   }
 });
 
