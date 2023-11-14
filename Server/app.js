@@ -2,7 +2,7 @@
 const express = require("express");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
-const cors = require('cors');
+const cors = require("cors");
 // Routers
 const userRouter = require("./routers/userRouter");
 const programRouter = require("./routers/programRouter");
@@ -12,8 +12,12 @@ const eligibilityRouter = require("./routers/eligibilityRouter");
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+}));
 app.use(express.json());
+
 
 app.use("/api/users", userRouter);
 app.use("/api/programs", programRouter);

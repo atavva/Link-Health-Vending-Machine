@@ -79,7 +79,6 @@ exports.verifySession = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyAdmin = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   if (!supabase) {
@@ -102,10 +101,10 @@ exports.verifyAdmin = catchAsync(async (req, res, next) => {
 
   if (role != "admin") {
     return res.status(403).json({
-      status: 'fail',
-      error: 'forbiddenRouteError',
+      status: "fail",
+      error: "forbiddenRouteError",
       message: "You must be an administrator to access this resource",
-    })
+    });
   }
 
   const serviceRoleClient = createServiceRoleClient();
@@ -113,11 +112,9 @@ exports.verifyAdmin = catchAsync(async (req, res, next) => {
   req.serviceRoleClient = serviceRoleClient;
 
   next();
-
 });
 
 exports.adminGetUsers = catchAsync(async (req, res, next) => {
-
   const supabase = req.serviceRoleClient;
 
   if (!supabase) {
@@ -127,21 +124,22 @@ exports.adminGetUsers = catchAsync(async (req, res, next) => {
     });
   }
 
-  const { data, error } = await supabase.from('profiles').select('*').eq('role', 'user');
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("role", "user");
 
   if (error) {
     return next(new AppError(error.message), 500);
   }
 
   res.status(200).json({
-    status: 'success',
-    data
+    status: "success",
+    data,
   });
-
 });
 
 exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
-
   const supabase = req.serviceRoleClient;
 
   if (!supabase) {
@@ -153,7 +151,11 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
 
   const uid = req.params.id;
 
-  const { data: selectData, error: selectError } = await supabase.from('profiles').select('*').eq('role', 'user').eq('id', uid);
+  const { data: selectData, error: selectError } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("role", "user")
+    .eq("id", uid);
 
   if (selectError) {
     return next(new AppError(error.message), 500);
@@ -161,12 +163,12 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
 
   if (selectData.length == 0) {
     return res.status(404).json({
-      status: 'fail',
-      message: 'User not found',
-    })
+      status: "fail",
+      message: "User not found",
+    });
   }
 
-  const currRegisteredPrograms = selectData[0]['registered_programs'];
+  const currRegisteredPrograms = selectData[0]["registered_programs"];
 
   const newRegisteredPrograms = req.body["registeredPrograms"];
 
@@ -174,15 +176,17 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input new registered program data into req.body.registeredPrograms",
+      message:
+        "Please input new registered program data into req.body.registeredPrograms",
     });
   }
 
-  if(!Array.isArray(newRegisteredPrograms)) {
+  if (!Array.isArray(newRegisteredPrograms)) {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please format new registered program data as a list of program IDs",
+      message:
+        "Please format new registered program data as a list of program IDs",
     });
   }
 
@@ -190,7 +194,9 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
     newRegisteredPrograms[i] = String(newRegisteredPrograms[i]);
   }
 
-  const finalRegisteredPrograms = [...new Set([...currRegisteredPrograms, ...newRegisteredPrograms])];
+  const finalRegisteredPrograms = [
+    ...new Set([...currRegisteredPrograms, ...newRegisteredPrograms]),
+  ];
 
   const { data: patchData, error: patchError } = await supabase
     .from("profiles")
@@ -208,9 +214,8 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       registered_programs: patchData[0].registered_programs,
-    }
+    },
   });
-
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
@@ -285,8 +290,8 @@ exports.signup = catchAsync(async (req, res, next) => {
     });
   }
 
-  const first_name = newUserInfo['firstName'] || "";
-  const last_name = newUserInfo['lastName'] || "";
+  const first_name = newUserInfo["firstName"] || "";
+  const last_name = newUserInfo["lastName"] || "";
 
   const { error: profileError } = await serviceRoleClient
     .from("profiles")
@@ -311,11 +316,17 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const jwtToken = data.session.access_token;
 
-  res.cookie("jwt", jwtToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+  /* const options = {
     maxAge: 7200000,
-  });
+    httpOnly: true,
+    path: "/",
+    secure: true,
+    sameSite: "None",
+  }; 
+
+  res.cookie("jwt", jwtToken, options); */
+
+  res.set({ "Set-Cookie": `jwt=${jwtToken}; HttpOnly; Secure; SameSite='None'; Max-Age=7200000` });
 
   res.status(201).json({
     status: "success",
@@ -364,12 +375,11 @@ exports.patchEligibility = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       eligibility: patchData[0].eligibility,
-    }
+    },
   });
 });
 
 exports.patchEligiblePrograms = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   const { data: selectData, error: selectError } = await supabase
@@ -388,15 +398,17 @@ exports.patchEligiblePrograms = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input new eligibile program data into req.body.eligiblePrograms",
+      message:
+        "Please input new eligibile program data into req.body.eligiblePrograms",
     });
   }
 
-  if(!Array.isArray(newEligiblePrograms)) {
+  if (!Array.isArray(newEligiblePrograms)) {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please format new eligible program data as a list of program IDs",
+      message:
+        "Please format new eligible program data as a list of program IDs",
     });
   }
 
@@ -404,7 +416,9 @@ exports.patchEligiblePrograms = catchAsync(async (req, res, next) => {
     newEligiblePrograms[i] = String(newEligiblePrograms[i]);
   }
 
-  const finalEligiblePrograms = [...new Set([...currEligiblePrograms, ...newEligiblePrograms])];
+  const finalEligiblePrograms = [
+    ...new Set([...currEligiblePrograms, ...newEligiblePrograms]),
+  ];
 
   const { data: patchData, error: patchError } = await supabase
     .from("profiles")
@@ -422,13 +436,11 @@ exports.patchEligiblePrograms = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       eligible_programs: patchData[0].eligible_programs,
-    }
+    },
   });
-
 });
 
 exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   const { data: selectData, error: selectError } = await supabase
@@ -447,15 +459,17 @@ exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input new registered program data into req.body.registeredPrograms",
+      message:
+        "Please input new registered program data into req.body.registeredPrograms",
     });
   }
 
-  if(!Array.isArray(newRegisteredPrograms)) {
+  if (!Array.isArray(newRegisteredPrograms)) {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please format new registered program data as a list of program IDs",
+      message:
+        "Please format new registered program data as a list of program IDs",
     });
   }
 
@@ -463,7 +477,9 @@ exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
     newRegisteredPrograms[i] = String(newRegisteredPrograms[i]);
   }
 
-  const finalRegisteredPrograms = [...new Set([...currRegisteredPrograms, ...newRegisteredPrograms])];
+  const finalRegisteredPrograms = [
+    ...new Set([...currRegisteredPrograms, ...newRegisteredPrograms]),
+  ];
 
   const { data: patchData, error: patchError } = await supabase
     .from("profiles")
@@ -481,13 +497,11 @@ exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       registered_programs: patchData[0].registered_programs,
-    }
+    },
   });
-
 });
 
 exports.deleteEligibility = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   const { data: selectData, error: selectError } = await supabase
@@ -506,23 +520,25 @@ exports.deleteEligibility = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input deleted eligibility data into req.body.eligibility as a list of Field Names",
+      message:
+        "Please input deleted eligibility data into req.body.eligibility as a list of Field Names",
     });
   }
 
   if (!Array.isArray(deletedEligibilityFieldNames)) {
     return res.status(400).json({
-      status: 'fail',
-      error: 'invalidDataError',
-      message: "Please input deleted eligibility data as a list of Field Names to delete"
-    })
+      status: "fail",
+      error: "invalidDataError",
+      message:
+        "Please input deleted eligibility data as a list of Field Names to delete",
+    });
   }
 
-  const deletedEligibility = {}
+  const deletedEligibility = {};
 
   deletedEligibilityFieldNames.forEach((fieldName) => {
     deletedEligibility[fieldName] = null;
-  })
+  });
 
   const finalEligibility = { ...currEligibility, ...deletedEligibility };
 
@@ -542,13 +558,11 @@ exports.deleteEligibility = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       eligibility: patchData[0].eligibility,
-    }
+    },
   });
-
 });
 
 exports.deleteEligiblePrograms = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   const { data: selectData, error: selectError } = await supabase
@@ -567,15 +581,17 @@ exports.deleteEligiblePrograms = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input deleted eligibile program data into req.body.eligiblePrograms",
+      message:
+        "Please input deleted eligibile program data into req.body.eligiblePrograms",
     });
   }
 
-  if(!Array.isArray(deletedEligiblePrograms)) {
+  if (!Array.isArray(deletedEligiblePrograms)) {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please format deleted eligible program data as a list of program IDs",
+      message:
+        "Please format deleted eligible program data as a list of program IDs",
     });
   }
 
@@ -584,7 +600,7 @@ exports.deleteEligiblePrograms = catchAsync(async (req, res, next) => {
   }
 
   const finalEligiblePrograms = currEligiblePrograms.filter((id) => {
-    return !(deletedEligiblePrograms.includes(id));
+    return !deletedEligiblePrograms.includes(id);
   });
 
   const { data: patchData, error: patchError } = await supabase
@@ -603,13 +619,11 @@ exports.deleteEligiblePrograms = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       eligible_programs: patchData[0].eligible_programs,
-    }
+    },
   });
-
 });
 
 exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
-
   const supabase = req.authClient;
 
   const { data: selectData, error: selectError } = await supabase
@@ -628,15 +642,17 @@ exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please input deleted registered program data into req.body.registeredPrograms",
+      message:
+        "Please input deleted registered program data into req.body.registeredPrograms",
     });
   }
 
-  if(!Array.isArray(deletedRegisteredPrograms)) {
+  if (!Array.isArray(deletedRegisteredPrograms)) {
     return res.status(400).json({
       status: "fail",
       error: "invalidDataError",
-      message: "Please format deleted registered program data as a list of program IDs",
+      message:
+        "Please format deleted registered program data as a list of program IDs",
     });
   }
 
@@ -645,7 +661,7 @@ exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
   }
 
   const finalRegisteredPrograms = currRegisteredPrograms.filter((id) => {
-    return !(deletedRegisteredPrograms.includes(id));
+    return !deletedRegisteredPrograms.includes(id);
   });
 
   const { data: patchData, error: patchError } = await supabase
@@ -664,10 +680,9 @@ exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       registered_programs: patchData[0].registered_programs,
-    }
+    },
   });
-
-})
+});
 
 // POST login user
 exports.login = catchAsync(async (req, res, next) => {
@@ -719,6 +734,4 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     status: "success",
     message: "User successfully deleted",
   });
-
 });
-
