@@ -9,14 +9,14 @@
 
 ## Users
 
-### <span style="color:yellow">Sign Up (In Progress)</span>
+### <span style="color:lightgreen">Sign Up (Implemented)</span>
 
-| Info             | Description                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| **Route**        | `/api/users/signup`                                                                    |
-| **Method**       | `POST`                                                                                 |
-| **Description**  | Signs the user up in the database (implemented) and logs the user in (not implemented) |
-| **Request Info** | `email` and `password` sent in body                                                    |
+| Info             | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| **Route**        | `/api/users/signup`                                                      |
+| **Method**       | `POST`                                                                   |
+| **Description**  | Signs the user up in the database and logs the user in via JWT in cookie |
+| **Request Info** | `email` and `password` sent in body                                      |
 
 #### Request
 
@@ -26,7 +26,12 @@ Content-Type: application/json
 
 {
   "email": "useremail@gmail.com",
-  "password": "jwu&be7^9e$5"
+  "password": "jwu&be7^9e$5",
+  "firstName"?,
+  "lastName"?,
+  "eligibilty"?,
+  "eligiblePrograms"?,
+  "registeredPrograms"?
 }
 ```
 
@@ -53,14 +58,14 @@ Status Code: 401
 }
 ```
 
-### <span style="color:yellow">Log In (In Progress)</span>
+### <span style="color:lightgreen">Log In (Implemented)</span>
 
-| Info             | Description                                                                           |
-| ---------------- | ------------------------------------------------------------------------------------- |
-| **Route**        | `/api/users/login`                                                                    |
-| **Method**       | `POST`                                                                                |
-| **Description**  | Authenicates the user (implemented) and sends them a JSON Web Token (not implemented) |
-| **Request Info** | `email` and `password` sent in body                                                   |
+| Info             | Description                                                      |
+| ---------------- | ---------------------------------------------------------------- |
+| **Route**        | `/api/users/login`                                               |
+| **Method**       | `POST`                                                           |
+| **Description**  | Authenicates the user and sends them a JSON Web Token via cookie |
+| **Request Info** | `email` and `password` sent in body                              |
 
 #### Request
 
@@ -97,7 +102,7 @@ Status Code: 401
 }
 ```
 
-### <span style="color:yellow">Delete User (In Progress)</span>
+### <span style="color:lightgreen">Delete User (Implemented)</span>
 
 | Info             | Description                                                                                |
 | ---------------- | ------------------------------------------------------------------------------------------ |
@@ -119,84 +124,460 @@ Authorization: Bearer {JSON_WEB_TOKEN}
 
 ```
 Status Code: 200
-
 {
-    status: 'success'
+    status: 'success',
+    message: 'User successfully deleted'
 }
 ```
 
 ##### Fail
 
 ```
-Status Code: 401
+Status Code: 500
 {
     status: 'fail',
-    error: TBD
+    error: "Internal Server Error"
 }
 ```
 
-### <span style="color:yellow">Update User Info (In Progress)</span>
+### <span style="color:lightgreen">Update Eligibility (Implemented)</span>
 
 | Info             | Description                                                                                  |
 | ---------------- | -------------------------------------------------------------------------------------------- |
-| **Route**        | `/api/users`                                                                                 |
+| **Route**        | `/api/users/eligibility`                                                                     |
 | **Method**       | `PATCH`                                                                                      |
 | **Description**  | Uses JWT to verify user and (after front-end confirmation), updates their info (eligibility) |
-| **Request Info** | JWT send in header, Body sent with patch information                                         |
+| **Request Info** | JWT sent in header, Body sent with an updated eligibility object                             |
 
 #### Request
 
 ```
-PATCH /api/users
-Content-Type: application/json
-Authorization: Bearer {JSON_WEB_TOKEN}
+PATCH /api/users/eligibility
+Authorization: Bearer ${jwt}
 
 {
     "eligibility": {
-        "agi": 85747
+        "agi": 23000
     }
 }
 ```
 
-#### Responses
-
-##### Success
+#### Response
 
 ```
 Status Code: 201
 
-{
-    status: 'success'
+{ // The updated user eligibility object
+    "status": "success",
+    "data": {
+        "eligibility": {
+            "age": 24,
+            "agi": 23000,
+            "dependents": 3
+        }
+    }
 }
 ```
 
-##### Fail
+Optionally, you can use this method to remove data, as "deleted" fields are stored as null values:
+
+#### Request
 
 ```
-Status Code: 401 | 400
+PATCH /api/users/eligibility
+Authorization: Bearer ${jwt}
+
 {
-    status: 'fail',
-    error: TBD
+    "eligibility": {
+        "dependents": null
+    }
 }
 ```
 
-### <span style="color:pink">Get Personal User Info (Not Implemented)</span>
+#### Response
+
+```
+Status Code: 201
+
+{ // The updated user eligibility object
+    "status": "success",
+    "data": {
+        "eligibility": {
+            "age": 24,
+            "agi": 23000,
+            "dependents": null
+        }
+    }
+}
+```
+
+### <span style="color:lightgreen">Update Eligible Programs (Implemented)</span>
+
+| Info             | Description                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/eligible-programs`                                                                       |
+| **Method**       | `PATCH`                                                                                              |
+| **Description**  | Uses JWT to verify user and (after front-end confirmation), updates their info (registered programs) |
+| **Request Info** | JWT send in header, Body sent with a list of eligibel program IDs object                             |
+
+#### Request
+
+```
+PATCH /api/users/eligible-programs
+Authorization: Bearer ${jwt}
+
+{
+    "eligiblePrograms": [2, 3] //A list of eligible programs - will add ones that are not already in user's eligible_programs
+}
+```
+
+#### Response
+
+```
+Status Code: 201
+
+{ // The updated list of eligible programs
+    "status": "success",
+    "data": {
+        "eligible_programs": [
+            "1",
+            "6",
+            "4",
+            "2",
+            "3"
+        ]
+    }
+}
+```
+
+### <span style="color:lightgreen">Update Registered Programs (Implemented)</span>
+
+| Info             | Description                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/registered-programs`                                                                     |
+| **Method**       | `PATCH`                                                                                              |
+| **Description**  | Uses JWT to verify user and (after front-end confirmation), updates their info (registered programs) |
+| **Request Info** | JWT send in header, Body sent with a list of registered program IDs object                           |
+
+#### Request
+
+```
+PATCH /api/users/registered-programs
+Authorization: Bearer ${jwt}
+
+{
+    "registeredPrograms": [1, 3] //A list of programs which the user has already registered for
+}
+```
+
+#### Response
+
+```
+Status Code: 201
+
+{ // The updated list of registered programs
+    "status": "success",
+    "data": {
+        "registered_programs": [
+            "5",
+            "3",
+            "1"
+        ]
+    }
+}
+```
+
+### <span style="color:lightgreen">Delete Eligibility (Implemented)</span>
+
+| Info             | Description                                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/eligibility`                                                                                   |
+| **Method**       | `DELETE`                                                                                                   |
+| **Description**  | Uses JWT to verify user and (after front-end confirmation), deletes their selected info (eligibility)      |
+| **Request Info** | JWT send in header, Body sent with an list of eligibility field names to delete (nulls values in database) |
+
+#### Request
+
+```
+DELETE /api/users/eligibility
+Authorization: Bearer ${jwt}
+
+{
+    "eligibility": ["agi"] // A list of field names to delete (nullify)
+}
+```
+
+#### Response
+
+```
+Status Code: 200
+
+{ // The updated user eligibility
+    "status": "success",
+    "data": {
+        "eligibility": {
+            "age": 24,
+            "agi": null,
+            "dependents": 3
+        }
+    }
+}
+```
+
+### <span style="color:lightgreen">Delete Eligible Programs (Implemented)</span>
+
+| Info             | Description                                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/eligible-programs`                                                                              |
+| **Method**       | `DELETE`                                                                                                    |
+| **Description**  | Uses JWT to verify user and (after front-end confirmation), deletes their selected info (eligible programs) |
+| **Request Info** | JWT send in header, Body sent with an list of program IDs to delete                                         |
+
+#### Request
+
+```
+DELETE /api/users/eligible-programs
+Authorization: Bearer ${jwt}
+
+{
+    "eligibilePrograms": [2] // A list of program IDs to remove from the user's eligible programs
+}
+```
+
+#### Response
+
+```
+Status Code: 200
+
+{ // The updated eligible program list
+    "status": "success",
+    "data": {
+        "eligible_programs": [
+            "1",
+            "6",
+            "4",
+            "3"
+        ]
+    }
+}
+```
+
+### <span style="color:lightgreen">Delete Registered Programs (Implemented)</span>
+
+| Info             | Description                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/registered-programs`                                                                              |
+| **Method**       | `DELETE`                                                                                                      |
+| **Description**  | Uses JWT to verify user and (after front-end confirmation), deletes their selected info (registered programs) |
+| **Request Info** | JWT send in header, Body sent with an list of program IDs to delete                                           |
+
+#### Request
+
+```
+DELETE /api/users/registered-programs
+Authorization: Bearer ${jwt}
+
+{
+    "eligibilePrograms": [2] // A list of program IDs to remove from the user's eligible programs
+}
+```
+
+#### Response
+
+```
+Status Code: 200
+
+{ // The updated registered programs list
+    "status": "success",
+    "data": {
+        "registered_programs": [
+            "5",
+            "3",
+            "1"
+        ]
+    }
+}
+```
+
+### <span style="color:lightgreen">Get Personal User Info (Implemented)</span>
 
 | Info             | Description                                                                  |
 | ---------------- | ---------------------------------------------------------------------------- |
 | **Route**        | `/api/users`                                                                 |
 | **Method**       | `GET`                                                                        |
 | **Description**  | Uses JWT to verify and retrieves the requesting user's decrypted information |
-| **Request Info** | JWT send in header                                                           |
+| **Request Info** | JWT sent in header                                                           |
 
-### <span style="color:pink">Admin Get User Info (Not Implemented)</span>
+#### Request
 
-| Info             | Description                                                        |
-| ---------------- | ------------------------------------------------------------------ |
-| **Route**        | `/api/users/admin`                                                 |
-| **Method**       | `GET`                                                              |
-| **Description**  | Uses JWT to verify and retrieves information about non-admin users |
-| **Request Info** | JWT send in header                                                 |
+```
+GET /api/users
+Authorization: Bearer ${jwt}
+```
+
+#### Response
+
+```
+Status Code: 200
+
+{
+    "status": "success",
+    "data": [
+        {
+            "id": "c2e4c48a-d882-4bb4-84df-34b42d0302b8",
+            "role": "admin",
+            "eligibility": {
+                "age": 24,
+                "agi": null,
+                "dependents": 3
+            },
+            "first_name": null,
+            "last_name": null,
+            "user_id": "c2e4c48a-d882-4bb4-84df-34b42d0302b8",
+            "eligible_programs": [
+                "1",
+                "6",
+                "4",
+                "3"
+            ],
+            "registered_programs": [
+                "5",
+                "3",
+                "1"
+            ],
+            "email": "nabji@berkeley.edu"
+        }
+    ]
+}
+```
+
+### <span style="color:lightgreen">Admin Get All User Info (Implemented)</span>
+
+| Info             | Description                                                                                                       |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Route**        | `/api/users/admin`                                                                                                |
+| **Method**       | `GET`                                                                                                             |
+| **Description**  | Uses JWT to verify and retrieves information about non-admin users (it will return a forbiddenError if not admin) |
+| **Request Info** | JWT sent in header                                                                                                |
+
+#### Request
+
+```
+GET /api/users/admin
+Authorization: Bearer ${jwt}
+```
+
+#### Response
+
+```
+Status Code: 200
+
+{
+    "status": "success",
+    "data": [
+        {
+            "id": "64e38c62-a16c-4013-99b9-ed84002732f6",
+            "role": "user",
+            "eligibility": {
+                "age": 70,
+                "agi": 14000,
+                "dependents": 5
+            },
+            "first_name": null,
+            "last_name": null,
+            "user_id": "64e38c62-a16c-4013-99b9-ed84002732f6",
+            "eligible_programs": [
+                "1",
+                "8",
+                "4"
+            ],
+            "registered_programs": [
+                "1"
+            ],
+            "email": "na933950@berkeley.edu"
+        },
+        {
+            "id": "1874d534-e744-40b4-99bc-6325ecc55f5a",
+            "role": "user",
+            "eligibility": {},
+            "first_name": "",
+            "last_name": "",
+            "user_id": "1874d534-e744-40b4-99bc-6325ecc55f5a",
+            "eligible_programs": [],
+            "registered_programs": [],
+            "email": "obiwan@kenobi.com"
+        },
+        {
+            "id": "b98e96ab-c442-44b3-8019-7cf7cf8a167c",
+            "role": "user",
+            "eligibility": {},
+            "first_name": "Obiwana",
+            "last_name": "Kenobia",
+            "user_id": "b98e96ab-c442-44b3-8019-7cf7cf8a167c",
+            "eligible_programs": [],
+            "registered_programs": [],
+            "email": "obiwana@kenodbi.com"
+        },
+        {
+            "id": "47cc0d5b-1d11-48cd-a084-b41756a0942c",
+            "role": "user",
+            "eligibility": {},
+            "first_name": "ste",
+            "last_name": "ste",
+            "user_id": "47cc0d5b-1d11-48cd-a084-b41756a0942c",
+            "eligible_programs": [],
+            "registered_programs": [],
+            "email": "seta#A#@asdf"
+        },
+        {
+            "id": "33d2aa7a-0ee5-42ef-ad24-fb8fe5feb8eb",
+            "role": "user",
+            "eligibility": {},
+            "first_name": "sadf",
+            "last_name": "asdf",
+            "user_id": "33d2aa7a-0ee5-42ef-ad24-fb8fe5feb8eb",
+            "eligible_programs": [],
+            "registered_programs": [],
+            "email": "asdf#@asdf"
+        }
+    ]
+}
+```
+
+### <span style="color:lightgreen">Admin: Update User Registered Programs (Implemented)</span>
+
+| Info             | Description                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Route**        | `/api/users/admin/:id`                                                                                       |
+| **Method**       | `PATCH`                                                                                                      |
+| **Description**  | Uses JWT to verify and updates a user's registered programs (if an admin has registered them)                |
+| **Request Info** | JWT sent in header, req.params contains a user ID to update, req.body contains a list of registered programs |
+
+#### Request
+
+```
+PATCH /api/users/admin/64e38c62-a16c-4013-99b9-ed84002732f6
+Authorization: Bearer ${jwt}
+
+{
+    "registeredPrograms": [1]
+}
+```
+
+#### Response
+
+```
+Status Code: 201
+
+{
+    "status": "success",
+    "data": {
+        "registered_programs": [
+            "1"
+        ]
+    }
+}
+```
 
 ## Programs
 
@@ -339,28 +720,30 @@ Content-Type: application/json
 When maxRemainingQuestions = 0, call `GET /api/programs/{userEligibility}` to determine eligible programs - the questions have finished
 
 #### `"Expected Type" Definitions`
-| "Expected Type" | Definition |
-| --- | --- |
-| "Number" | We are expecting a number
-| "Range a-b" | We are expecting a number in the range from a to b |
-| "Boolean" | We are expecting a true or false value (yes or no) |
+
+| "Expected Type"     | Definition                                                                                     |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| "Number"            | We are expecting a number                                                                      |
+| "Range a-b"         | We are expecting a number in the range from a to b                                             |
+| "Boolean"           | We are expecting a true or false value (yes or no)                                             |
 | "Option a\|b\|c\|d" | We are expecting one of the values as a string, separated by a \|, in this case, a, b, c, or d |
-| "String" | We are expecting a string of any value |
+| "String"            | We are expecting a string of any value                                                         |
 
 ### <span style="color:lightgreen">Get Field Names (Implemented)</span>
 
-| Info             | Description                                                                                                           |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **Route**        | `/api/eligibility`                                                                                                    |
-| **Method**       | `GET`                                                                                                                |
+| Info             | Description                                                              |
+| ---------------- | ------------------------------------------------------------------------ |
+| **Route**        | `/api/eligibility`                                                       |
+| **Method**       | `GET`                                                                    |
 | **Description**  | Returns a list of user 'eligbility' field names to use in ts definitions |
-| **Request Info** | None |
+| **Request Info** | None                                                                     |
 
 #### Request
 
 ```
 POST /api/eligibility
 ```
+
 #### Response
 
 ```
@@ -371,12 +754,11 @@ POST /api/eligibility
             "agi",
             "dependents",
             "snap",
-            ...fieldNames //The rest of the field names in the DB        
+            ...fieldNames //The rest of the field names in the DB
         ]
     }
 }
 ```
-
 
 ## Contact
 
@@ -413,3 +795,57 @@ Status Code: 200
     status: 'success'
 }
 ```
+
+## Auth Errors
+
+#### Authentication Error
+Sent when no JWT is sent to the server - the user is not logged in
+```
+Status Code: 401
+
+{
+    status: "fail",
+    error: "authenticationError",
+    message: "Authentication is required. Please sign in to access this resource",
+}
+```
+
+#### Expired Session Error
+Sent when the user's session has expired - the user needs to log in again
+
+```
+Status Code: 401
+
+{
+    status: "fail",
+    error: "expiredSessionError",
+    message: "Your session has expired. Please log in again to access this resource",
+}
+```
+
+#### Invalid Session Error
+Sent when the user's JWT is invalid and could not be verified by the server - the user needs to log in again
+
+```
+Status Code: 401
+
+{
+    status: "fail",
+    error: "invalidSessionError",
+    message:"Your session is invalid. Please log in again to access this resource",
+}
+```
+
+#### Forbidden Route Error
+Sent when a normal user tries to access an admin-protected route
+
+```
+Status Code: 403
+{
+    status: 'fail',
+    error: 'forbiddenRouteError',
+    message: "You must be an administrator to access this resource",
+}
+```
+
+

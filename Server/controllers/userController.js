@@ -716,7 +716,6 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
     status: "success",
     message: "User successfully deleted",
   });
-  // Delete the user from the database
-  /* YOUR CODE HERE */
+
 });
 
