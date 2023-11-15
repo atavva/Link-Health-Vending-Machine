@@ -4,9 +4,10 @@
 	import { user } from '$lib/stores';
 	import { ProgressBar } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
-	let question = null;
+	let question: { maxRemainingQuestions: number; questionInfo: { Question: any; expected_type: string; field_name: string; }; } | null = null;
 	let questionsAsked = 0;
 	let questionsRemaining = 0;
+	let loadingNextQuestion = false;
 	let userObj = $user;
 	let ineligiblePrograms: number[] = [];
 	let answer: any;
@@ -18,7 +19,17 @@
 		// });
 	}
 
+	function updateAll() {
+		const newData: { [key: string]: any } = {};
+		newData[question?.questionInfo.field_name!] = answer;
+		userObj.eligibility = {...userObj.eligibility, ...newData}
+		getNextQuestion();
+		answer = "";
+	}
+
+
 	async function getNextQuestion() {
+		loadingNextQuestion = true;
 		const response = await fetch(API_URL + '/eligibility', {
 			method: 'POST',
 			headers: {
@@ -36,11 +47,16 @@
 			// 	updateUser(question);
 			// }
 			const result = await response.json();
+			if (result.data.maxRemaningQuestions == 0 || result.data.maxRemaningQuestions == null) {
+				
+			}
+			loadingNextQuestion = false;
 			question = result.data;
 			questionsAsked += 1;
-			questionsRemaining = questionsAsked + question.maxRemaningQuestions;
+			questionsRemaining = questionsAsked + question.maxRemainingQuestions;
 
-			console.log(result);
+			console.log(questionsAsked);
+			console.log(questionsRemaining);
 		} else {
 			alert('error');
 		}
@@ -65,13 +81,22 @@
 			{:else}
 				<input type="text" bind:value={answer} />
 			{/if}
-			<button class="btn variant-outline-secondary">Next</button>
-			<ProgressBar
-				transition="transition-all"
-				label="Progress Bar"
-				max={questionsRemaining}
-				value={questionsAsked}
-			/>
+			<button class="btn variant-outline-secondary" on:click={updateAll}>Next</button>
+			{#if questionsAsked != 0}
+				<ProgressBar
+					transition="transition-all"
+					label="Progress Bar"
+					max={questionsRemaining}
+					value={questionsAsked}
+				/>
+			{:else}
+				<ProgressBar
+					transition="transition-all"
+					label="Progress Bar"
+					max={1}
+					value={1}
+				/>
+			{/if}
 		</div>
 	{:else}
 		<Loading />
