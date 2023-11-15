@@ -12,7 +12,7 @@ exports.getFieldNames = catchAsync(async (req, res, next) => {
     .select('"field_name"');
 
   if (error) {
-    return next(new AppError(error.message, error.code));
+    return next(new AppError(error.message, 404));
   }
 
   const eligibility = {};
@@ -23,6 +23,26 @@ exports.getFieldNames = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: { eligibility },
+  });
+});
+
+exports.getAllQuestions = catchAsync(async (req, res, next) => {
+  const { data, error } = await supabase.from("eligibility").select("Question");
+
+  if (error) {
+    return next(new AppError(error.message, 404));
+  }
+
+  const questions = [];
+  data.forEach((question) => {
+    questions.push(question["Question"]);
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      questions,
+    },
   });
 });
 /**

@@ -9,6 +9,11 @@ const programRouter = require("./routers/programRouter");
 const contactRouter = require("./routers/contactRouter");
 const eligibilityRouter = require("./routers/eligibilityRouter");
 
+process.on('unhandledRejection', err => {
+  console.error('Unhandled Rejection:', err);
+  process.exit(1); // Exit the process or handle it as per your application's requirements
+});
+
 const app = express();
 
 // Middleware
