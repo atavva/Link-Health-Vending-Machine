@@ -15,6 +15,7 @@ const {
   verifyAdmin,
   adminGetUsers,
   adminUpdateRegisteredPrograms,
+  adminStats
 } = require("../controllers/userController");
 
 const router = express.Router();
@@ -40,6 +41,8 @@ router
   .delete(deleteRegisteredPrograms);
 
 router.route("/admin").all(verifySession, verifyAdmin).get(adminGetUsers);
+
+router.route("/admin/stats").all(verifySession, verifyAdmin).get(adminStats);
 
 router
   .route("/admin/:id")

@@ -3,11 +3,17 @@ const catchAsync = require("../utils/catchAsync");
 const determineEligibilityForAllPrograms = require("../utils/determineEligibility");
 const supabase = require("../utils/client");
 
-const allPrograms = async () => {
+const allPrograms = async (adminAccess = false) => {
   // Utility function
   // RETURNS: List of all the programs in the database
 
   let { data: programs, error } = await supabase.from("programs").select("*");
+
+  if (!adminAccess) {
+    programs.forEach((program) => {
+      delete program.num_signed_up;
+    });
+  }
 
   return programs;
 

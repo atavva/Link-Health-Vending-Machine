@@ -114,6 +114,26 @@ exports.verifyAdmin = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.adminStats = catchAsync(async(req, res, next) => {
+
+  const programs = await allPrograms(adminAccess = true);
+
+  if (!programs) {
+    res.status(404).json({
+      'status': 'fail',
+      'message': 'Unable to retrieve programs'
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      programs
+    },
+  })
+
+});
+
 exports.adminGetUsers = catchAsync(async (req, res, next) => {
   const supabase = req.serviceRoleClient;
 
@@ -197,6 +217,37 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
   const finalRegisteredPrograms = [
     ...new Set([...currRegisteredPrograms, ...newRegisteredPrograms]),
   ];
+
+  for (let i = 0; i < newRegisteredPrograms.length; i++) {
+    newRegisteredPrograms[i] = String(newRegisteredPrograms[i]);
+  }
+
+  const { data: programSelectData, error: programSelectError } = await supabase
+    .from("programs")
+    .select("*")
+    .in("program_id", newRegisteredPrograms);
+
+  if (programSelectError) {
+    return next(new AppError("Failure to select information", 500));
+  }
+
+  programSelectData
+    .filter((program) => {
+      return currRegisteredPrograms.indexOf(program.program_id) != -1;
+    })
+    .forEach(async (program) => {
+      const updatedNumSignedUp = program.num_signed_up + 1;
+
+      const { data: updateData, error: updateError } = await supabase
+        .from("programs")
+        .update({ num_signed_up: updatedNumSignedUp })
+        .eq("program_id", program.program_id)
+        .select();
+
+      if (updateError) {
+        return next(new AppError(updateError.message), 500);
+      }
+    });
 
   const { data: patchData, error: patchError } = await supabase
     .from("profiles")
@@ -485,6 +536,33 @@ exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
     newRegisteredPrograms[i] = String(newRegisteredPrograms[i]);
   }
 
+  const { data: programSelectData, error: programSelectError } = await supabase
+    .from("programs")
+    .select("*")
+    .in("program_id", newRegisteredPrograms);
+
+  if (programSelectError) {
+    return next(new AppError("Failure to select information", 500));
+  }
+
+  programSelectData
+    .filter((program) => {
+      return currRegisteredPrograms.indexOf(program.program_id) != -1;
+    })
+    .forEach(async (program) => {
+      const updatedNumSignedUp = program.num_signed_up + 1;
+
+      const { data: updateData, error: updateError } = await supabase
+        .from("programs")
+        .update({ num_signed_up: updatedNumSignedUp })
+        .eq("program_id", program.program_id)
+        .select();
+
+      if (updateError) {
+        return next(new AppError(updateError.message), 500);
+      }
+    });
+
   const finalRegisteredPrograms = [
     ...new Set([...currRegisteredPrograms, ...newRegisteredPrograms]),
   ];
@@ -671,6 +749,33 @@ exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
   const finalRegisteredPrograms = currRegisteredPrograms.filter((id) => {
     return !deletedRegisteredPrograms.includes(id);
   });
+
+  const { data: programSelectData, error: programSelectError } = await supabase
+    .from("programs")
+    .select("*")
+    .in("program_id", deletedRegisteredPrograms);
+
+  if (programSelectError) {
+    return next(new AppError("Failure to select information", 500));
+  }
+
+  programSelectData
+    .filter((program) => {
+      return currRegisteredPrograms.indexOf(program.program_id) == -1;
+    })
+    .forEach(async (program) => {
+      const updatedNumSignedUp = program.num_signed_up - 1;
+
+      const { data: updateData, error: updateError } = await supabase
+        .from("programs")
+        .update({ num_signed_up: updatedNumSignedUp })
+        .eq("program_id", program.program_id)
+        .select();
+
+      if (updateError) {
+        return next(new AppError(updateError.message), 500);
+      }
+    });
 
   const { data: patchData, error: patchError } = await supabase
     .from("profiles")
