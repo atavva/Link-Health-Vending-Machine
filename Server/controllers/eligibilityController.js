@@ -9,7 +9,7 @@ const { allPrograms } = require("./programController");
 exports.getFieldNames = catchAsync(async (req, res, next) => {
   const { data, error } = await supabase
     .from("eligibility")
-    .select('"Field Name"');
+    .select('"field_name"');
 
   if (error) {
     return next(new AppError(error.message, error.code));
@@ -17,7 +17,7 @@ exports.getFieldNames = catchAsync(async (req, res, next) => {
 
   const eligibility = {};
   data.forEach((el) => {
-    eligibility[el["Field Name"]] = null;
+    eligibility[el["field_name"]] = null;
   });
 
   res.status(200).json({
@@ -81,7 +81,7 @@ exports.determineNextQuestion = catchAsync(async (req, res, next) => {
     await supabase
       .from("eligibility")
       .select("count")
-      .in("Field Name", Object.keys(bestNextEligibilityScores));
+      .in("field_name", Object.keys(bestNextEligibilityScores));
 
   const maxRemainingQuestions = remainingQuestionData[0].count || NaN;
 
@@ -119,7 +119,7 @@ const getQuestionInfo = async (fieldName) => {
   const { data, error } = await supabase
     .from("eligibility")
     .select("*")
-    .eq("Field Name", fieldName);
+    .eq("field_name", fieldName);
 
   if (error) {
     return {
