@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { focusTrap, ProgressBar, Stepper, Step } from '@skeletonlabs/skeleton';
 	import { API_URL } from '$lib/api';
+	import { user } from '$lib/stores';
+	import { goto } from '$app/navigation';
 	let isFocused: boolean = true;
 	let firstName: string = '';
 	let lastName: string = '';
@@ -50,20 +52,14 @@
 				password
 			})
 		});
-		console.log(
-			JSON.stringify({
-				firstName,
-				lastName,
-				email,
-				password
-			})
-		);
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log(data);
-            window.location.href = "/User"
+			user.update((current) => {
+				return { ...current, jwt: data.jwt, firstName: firstName, lastName: lastName, email: email };
+			});
 
+			goto('/User')
 		} else {
 			alert('Signup failed, please try again');
 		}
@@ -87,26 +83,22 @@
 
 				<label class="label">
 					<span>Last Name</span>
-					<input
-						bind:value={lastName}
-						class="input"
-						type="text"
-						placeholder="Enter last name..."
-					/>
+					<input bind:value={lastName} class="input" type="text" placeholder="Enter last name..." />
 				</label>
 			</Step>
 			<Step>
 				<svelte:fragment slot="header">Please Input Email</svelte:fragment>
 				<label class="label">
-				<label class="label">
-					<input
-						bind:value={email}
-						class="input"
-						type="email"
-						placeholder="Enter email address..."
-					/>
-				</label>
-			</Step>
+					<label class="label">
+						<input
+							bind:value={email}
+							class="input"
+							type="email"
+							placeholder="Enter email address..."
+						/>
+					</label>
+				</label></Step
+			>
 			<Step buttonCompleteLabel="Sign Up">
 				<svelte:fragment slot="header">Please Input a Strong Password</svelte:fragment>
 				<label class="label">

@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { API_URL } from '$lib/api';
+	import { user } from '$lib/stores';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	let isFocused: boolean = true;
 	let email = '';
 	let password = '';
-
 	async function SignIn() {
 		const response = await fetch(API_URL + '/users/login', {
 			method: 'POST',
@@ -16,21 +17,17 @@
 				password
 			})
 		});
-		console.log(
-			JSON.stringify({
-				email,
-				password
-			})
-		);
+
 		if (response.ok) {
 			const data = await response.json();
-			console.log(data);
 
-            window.location.href = "/User"
-			// Handle successful login here
+			user.update((current) => {
+				return { ...current, jwt: data.jwt };
+			});
+
+			goto('/User')
 		} else {
 			alert('Login failed');
-			// Handle login failure here
 		}
 	}
 

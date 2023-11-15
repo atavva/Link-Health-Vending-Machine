@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../app.postcss';
-	import Navagation from '$lib/Components/Navagation.svelte';
 	import {
 		AppShell,
 		AppBar,

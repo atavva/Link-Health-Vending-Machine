@@ -1,12 +1,21 @@
-<script>
-	import { onMount } from 'svelte';
-  import { API_URL } from '$lib/api';
+<script lang="ts">
 	import Loading from '$lib/Components/Loading.svelte';
-	import { Stepper, Step, ProgressBar, ProgressRadial } from '@skeletonlabs/skeleton';
+	import { API_URL } from '$lib/api';
+	import { user } from '$lib/stores';
+	import { ProgressBar } from '@skeletonlabs/skeleton';
 	let question = null;
 	let questionsAsked = 0;
 	let questionsRemaining = 0;
-	// Total Max question is 0 -> USer page
+	let userObj = $user;
+	let ineligiblePrograms = [];
+	let answer: any;
+	function updateUser(fieldName: any) {
+		console.log(fieldName);
+		// user.update((current)=> {
+		//     return {...current, eligibility.fieldName:answer}
+		// });
+	}
+
 	async function getNextQuestion() {
 		const response = await fetch(API_URL + '/eligibility', {
 			method: 'POST',
@@ -14,37 +23,38 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				eligiblePrograms: [], // List of program IDs
-				ineligiblePrograms: [], // List of program IDs
-				eligibility: {
-					// User eligibility info
-					agi: 35000
-				}
+				eligiblePrograms: userObj.eligiblePrograms,
+				ineligiblePrograms: ineligiblePrograms,
+				eligbility: userObj.eligibility
 			})
 		});
 
 		if (response.ok) {
+			if (question) {
+				updateUser(question);
+			}
 			const result = await response.json();
 			question = result.data;
-			console.log(result)
+			questionsAsked += 1;
+			questionsRemaining = questionsAsked + question.maxRemaningQuestions;
+
+			console.log(result);
+		} else {
+			alert('error');
 		}
 	}
-
-	onMount(getNextQuestion);
 </script>
 
 <div class="h-full flex flex-col justify-center items-center">
 	{#if question}
-		<div class="m-4 card p-8 text-token space-y-4">
+		<div class="m-4 card w-3/5 p-8 text-token space-y-4">
 			<h1>{question.Question}</h1>
-			<p>Field Name: {question['Field Name']}</p>
-			<p>Expected Type: {question['Expected Type']}</p>
-			<button on:click={getNextQuestion}>Update</button>
+			<!-- <input bind:value={answer} class="" type={question.questionInfo.expectedType} /> -->
 			<ProgressBar
 				transition="transition-all"
 				label="Progress Bar"
-				value={questionsAsked}
 				max={questionsRemaining}
+				value={questionsAsked}
 			/>
 		</div>
 	{:else}
