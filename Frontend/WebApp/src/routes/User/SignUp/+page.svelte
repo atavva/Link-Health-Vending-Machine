@@ -56,18 +56,24 @@
 		if (response.ok) {
 			const data = await response.json();
 			user.update((current) => {
-				return { ...current, jwt: data.jwt, firstName: firstName, lastName: lastName, email: email };
+				return {
+					...current,
+					jwt: data.jwt,
+					firstName: firstName,
+					lastName: lastName,
+					email: email
+				};
 			});
 
-			goto('/User')
+			goto('/User');
 		} else {
 			alert('Signup failed, please try again');
 		}
 	}
 </script>
 
-<div class="h-full flex justify-center items-center">
-	<form class="h-3/5 w-2/5 m-auto card p-8 text-token space-y-4" use:focusTrap={isFocused}>
+<div class="h-full m-5 flex justify-center items-center">
+	<form class=" h-4/5 w-max m-auto card p-8 text-token space-y-4" use:focusTrap={isFocused}>
 		<Stepper on:complete={signup}>
 			<Step>
 				<svelte:fragment slot="header">Please Input First and Last Name</svelte:fragment>
@@ -85,6 +91,10 @@
 					<span>Last Name</span>
 					<input bind:value={lastName} class="input" type="text" placeholder="Enter last name..." />
 				</label>
+		<div class="text-center">
+					<a href="/User/SignIn" class="btn variant-filled">Sign In</a>
+				</div>
+			
 			</Step>
 			<Step>
 				<svelte:fragment slot="header">Please Input Email</svelte:fragment>
@@ -97,8 +107,8 @@
 							placeholder="Enter email address..."
 						/>
 					</label>
-				</label></Step
-			>
+				</label>
+		</Step>
 			<Step buttonCompleteLabel="Sign Up">
 				<svelte:fragment slot="header">Please Input a Strong Password</svelte:fragment>
 				<label class="label">

@@ -25,7 +25,7 @@
 				return { ...current, jwt: data.jwt };
 			});
 
-			goto('/User')
+			goto('/User');
 		} else {
 			alert('Login failed');
 		}
@@ -36,7 +36,7 @@
 	// Repeate
 </script>
 
-<div class="h-screen flex justify-center items-center">
+<div class="h-full flex justify-center items-center">
 	<form class="h-fit w-fit m-4 card p-8 text-token space-y-4" use:focusTrap={isFocused}>
 		<label class="label">
 			<span>Email</span>
@@ -46,8 +46,9 @@
 			<span>Password</span>
 			<input bind:value={password} class="input" type="password" placeholder="Enter password..." />
 		</label>
-		<div class="text-center">
+		<div class="flex  justify-between">
 			<button on:click={SignIn} class="btn variant-filled">Sign In</button>
+			<a href="/User/SignUp" class="btn variant-filled">Sign Up</a>
 		</div>
 	</form>
 </div>

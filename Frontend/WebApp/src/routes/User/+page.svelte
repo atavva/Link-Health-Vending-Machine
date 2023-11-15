@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
+	import { goto } from '$app/navigation';
 	import Loading from '$lib/Components/Loading.svelte';
 	import { user } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
@@ -8,6 +10,11 @@
 	console.log(userObj, $user);
 	if (userObj.jwt.length > 0) {
 		SignedIn = true;
+	} else {
+		if (browser) {
+			// This is temp it should allow show users to not sign in and see these things (this should only trig if users tries to sign up for a program without being singed in)
+			goto('/User/SignIn');
+		}
 	}
 
 	// For Log in
@@ -45,6 +52,5 @@
 		</div>
 	</div>
 {:else}
-	Please Sign in
 	<Loading />
 {/if}

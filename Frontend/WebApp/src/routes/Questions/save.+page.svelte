@@ -1,12 +1,13 @@
 <script>
 	import { onMount } from 'svelte';
-  import { API_URL } from '$lib/api';
+	import { API_URL } from '$lib/api';
 	import Loading from '$lib/Components/Loading.svelte';
 	import { Stepper, Step, ProgressBar, ProgressRadial } from '@skeletonlabs/skeleton';
 	let question = null;
 	let questionsAsked = 0;
 	let questionsRemaining = 0;
-	// Total Max question is 0 -> USer page
+
+	// Still Need to set user field values (more svelte store stuff)
 	async function getNextQuestion() {
 		const response = await fetch(API_URL + '/eligibility', {
 			method: 'POST',
@@ -26,7 +27,7 @@
 		if (response.ok) {
 			const result = await response.json();
 			question = result.data;
-			console.log(result)
+			console.log(result);
 		}
 	}
 

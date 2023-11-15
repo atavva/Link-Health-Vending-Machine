@@ -7,8 +7,7 @@ import { writable } from 'svelte/store';
     "email" : "",
     "firstName" : "",
     "lastName" : "",
-    "eligibility": "",
-    "ineligiibleProgeams": [],
+    "eligibility": {},
     "eligiblePrograms" : [],
     "registeredPrograms" : [],
     "pendingPrograms" : []

@@ -20,33 +20,33 @@
 
 	async function deleteUser() {
 		// const response = await fetch(API_URL + '/users', {
-			// method: 'DELETE',
-			// headers: {
-				// Authorization: `Bearer ${jwt}`,
-				// 'Content-Type': 'application/json'
-			// }
-		// });
-// 
-		// if (response.ok) {
-			// const data = await response.json();
-			// return data;
-		// } else {
-			// throw new Error('Failed to delete user');
+		// method: 'DELETE',
+		// headers: {
+		// Authorization: `Bearer ${jwt}`,
+		// 'Content-Type': 'application/json'
 		// }
-		alert("Bye Bye")
-		window.location.href = "/"
+		// });
+		//
+		// if (response.ok) {
+		// const data = await response.json();
+		// return data;
+		// } else {
+		// throw new Error('Failed to delete user');
+		// }
+		alert('Bye Bye');
+		window.location.href = '/';
 	}
 </script>
 
-<div class="h-full flex flex-col justify-center items-center">
-	<div class="flex flex-col bg-surface-700 p-3">
-		{#if fields}
+<div class="h-full  flex flex-col justify-center items-center">
+	{#if fields}
+		<div class="flex w-4/5 flex-col bg-surface-800 p-3">
 			{#each Object.entries(fields) as [field, value]}
 				<h1 class="m-2">{field.toUpperCase()}: {value === null ? 'No data' : value}</h1>
 			{/each}
-			<button on:click={deleteUser} class="btn variant-filled-warning">Delete Account</button>
-		{:else}
-			<Loading />
-		{/if}
-	</div>
+			<button on:click={deleteUser} class="btn variant-filled-error">Delete Account</button>
+		</div>
+	{:else}
+		<Loading />
+	{/if}
 </div>
