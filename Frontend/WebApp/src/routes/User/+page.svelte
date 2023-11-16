@@ -48,6 +48,7 @@
 			const { data } = await response.json();
 
 			userObj.eligiblePrograms = data.filteredPrograms;
+			console.log(userObj.eligiblePrograms) 
 		} else {
 			console.error('Failed to fetch programs');
 		}
@@ -85,6 +86,8 @@
 								jurisdiction={p.jurisdiction}
 								image={p.image}
 								description={p.long_desc}
+								programID={p.program_id}
+
 							/>
 						{/each}
 					</div>
