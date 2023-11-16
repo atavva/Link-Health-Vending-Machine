@@ -9,9 +9,9 @@
 
 <div class="h-full flex flex-col justify-center items-center">
 	<div class="hero">
-		<h1 class="text-xl">Link Health Vending Machine</h1>
+		<h1 class="h1">Link Health Vending Machine</h1>
 	</div>
-	<div class="m-5">
+	<div class="m-5 p">
 		<p>
 			Lorem ipsum dolor sit amet consectetur, adipisicing elit. Harum odio esse aspernatur aliquam
 			dolorem quas! Deleniti voluptate nisi modi veniam, quae quas odio molestiae rem, harum saepe,

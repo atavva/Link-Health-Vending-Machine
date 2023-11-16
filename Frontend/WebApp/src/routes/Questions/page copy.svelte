@@ -5,6 +5,7 @@
 	import { user } from '$lib/stores';
 	import { ProgressBar } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
+	import { tick } from 'svelte';
 	let question: {
 		maxRemainingQuestions: number;
 		questionInfo: { Question: any; expected_type: string; field_name: string };
@@ -24,40 +25,21 @@
 	function updateAll() {
 		const newData: { [key: string]: any } = {};
 		newData[question?.questionInfo.field_name!] = answer;
-		userObj.eligibility = { ...userObj.eligibility, ...newData };
-		console.log(userObj);
+
+		user.update((current) => {
+			return {
+				...current,
+				elgibility: { ...current.elgibility, [question?.questionInfo.field_name]: answer }
+			};
+		});
 		console.log($user);
 		getNextQuestion();
 		answer = '';
 	}
 
-	async function updateUser() {
-		if (userObj.jwt.length > 0) {
-			const response = await fetch(API_URL + '/Users/eligibility', {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: 'Bearer ' + userObj.jwt
-				},
-
-				body: JSON.stringify({
-					eligibility: userObj.eligibility
-				})
-			});
-			if (response.ok) {
-				console.log('User Updated on DB');
-			} else {
-				console.log(
-					JSON.stringify({
-						eligibility: userObj.eligibility
-					})
-				);
-				alert('Failed to update user');
-			}
-		}
-	}
 	async function getNextQuestion() {
 		loadingNextQuestion = true;
+		await tick();
 		const response = await fetch(API_URL + '/eligibility', {
 			method: 'POST',
 			headers: {
@@ -81,8 +63,7 @@
 			question = result.data;
 			questionsAsked += 1;
 			questionsRemaining = questionsAsked + question.maxRemainingQuestions;
-			if (questionsAsked == questionsRemaining) {
-				updateUser();
+			if (questionsAsked + 1 == questionsRemaining) {
 				goto('/User');
 			}
 

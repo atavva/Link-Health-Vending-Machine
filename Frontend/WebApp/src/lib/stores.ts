@@ -1,14 +1,14 @@
 import { localStorageStore } from '@skeletonlabs/skeleton';
-import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 
-  export const languagePreference = writable('en');
-  export const user = writable({
-    "jwt" : "",
-    "email" : "",
-    "firstName" : "",
-    "lastName" : "",
-    "eligibility": {},
-    "eligiblePrograms" : [],
-    "registeredPrograms" : [],
-    "pendingPrograms" : []
-  });
+export const user: Writable<{}> = localStorageStore('user', {
+	jwt: '',
+	email: '',
+	firstName: '',
+	lastName: '',
+	eligibility: {},
+	eligiblePrograms: [],
+	registeredPrograms: [],
+	pendingPrograms: [],
+	language: []
+});

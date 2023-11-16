@@ -21,42 +21,44 @@
 </script>
 
 {#if programs}
-	<div class="flex flex-wrap m-3">
+	<div class="flex flex-wrap justify-between">
 		{#each programs as program (program.program_id)}
-			<div on:click={openModal} class=" m-4 card card-hover block w-1/5">
-				<header height="10%">
-					<h1 class="relative w-fit m-auto p-2 z-10 text-xl font-bold bg-surface-100-800-token">
+			<div
+				class="flex flex-col justify-between m-4 card card-hover overflow-hidden block w-1/5"
+			>
+				<header class="overflow-hidden" height="10%">
+					<h1 class="h3 m-2 text-center">
 						{program.program_name}
 					</h1>
 
 					<img
 						src="data:image/jpeg;base64,{program.image}"
-						class=" h-auto overflow-hidden object-scale-down
-						h-48 w-96 md:object-scale-down rounded-t rounded-b-lg"
+						class=" object-scale-down w-full aspect-[21/9] rounded-t rounded-b-lg"
 						alt={program.program_name}
 					/>
 				</header>
-				<div class="m-4">
-					<b>{program.jurisdiction}</b>
+				<div class="m-4 p">
+					<b>Jurisdiction: {program.jurisdiction}</b>
 					<p>{program.long_desc}</p>
 				</div>
-				<footer class="card-footer  flex justify-center">
+				<footer class="card-footer flex justify-center">
 					<button class="btn variant-outline-secondary">Sign Up</button>
 				</footer>
-				<!-- <h2>Eligibility</h2> -->
-				<!-- {#each program.eligibility as eligibility, i} -->
-				<!-- <div> -->
-				<!-- <h3>Condition {i + 1}: {eligibility.condition}</h3> -->
-				<!-- <ul> -->
-				<!-- {#each eligibility.rules as rule} -->
-				<!-- <li>{rule.fieldName} {rule.comparisonOperator} {rule.value}</li> -->
-				<!-- {/each} -->
-				<!-- </ul> -->
-				<!-- </div> -->
-				<!-- {/each} -->
 			</div>
 		{/each}
 	</div>
 {:else}
 	<Loading />
 {/if}
+
+<!-- <h2>Eligibility</h2> -->
+<!-- {#each program.eligibility as eligibility, i} -->
+<!-- <div> -->
+<!-- <h3>Condition {i + 1}: {eligibility.condition}</h3> -->
+<!-- <ul> -->
+<!-- {#each eligibility.rules as rule} -->
+<!-- <li>{rule.fieldName} {rule.comparisonOperator} {rule.value}</li> -->
+<!-- {/each} -->
+<!-- </ul> -->
+<!-- </div> -->
+<!-- {/each} -->

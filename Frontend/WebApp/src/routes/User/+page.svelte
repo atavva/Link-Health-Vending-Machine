@@ -1,22 +1,57 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import Loading from '$lib/Components/Loading.svelte';
+	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
-	let SignedIn = false;
-	let userObj = $user;
-	$: userObj = $user;
-	console.log(userObj, $user);
-	if (userObj.jwt.length > 0) {
-		SignedIn = true;
-	} else {
-		if (browser) {
-			// This is temp it should allow show users to not sign in and see these things (this should only trig if users tries to sign up for a program without being singed in)
-			goto('/User/SignIn');
-		}
+
+	import ProgramModal from '$lib/Components/ProgramModal.svelte';
+	import Icon from '@iconify/svelte';
+	import { API_URL } from '$lib/api';
+
+	// For carousel
+	let elemCarousel: HTMLDivElement;
+
+	function carouselLeft(): void {
+		const x =
+			elemCarousel.scrollLeft === 0
+				? elemCarousel.clientWidth * elemCarousel.childElementCount // loop
+				: elemCarousel.scrollLeft - elemCarousel.clientWidth; // step left
+		elemCarousel.scroll(x, 0);
 	}
 
+	function carouselRight(): void {
+		const x =
+			elemCarousel.scrollLeft === elemCarousel.scrollWidth - elemCarousel.clientWidth
+				? 0 // loop
+				: elemCarousel.scrollLeft + elemCarousel.clientWidth; // step right
+		elemCarousel.scroll(x, 0);
+	}
+
+	let SignedIn = false;
+	let filteredPrograms;
+	let userObj: {};
+	$: {
+		userObj = $user;
+	}
+	onMount(async () => {
+		if (Object.keys(userObj.eligibility).length !== 0) {
+			SignedIn = false;
+		} else {
+			SignedIn = true;
+		}
+
+		const queryParams = new URLSearchParams(userObj.eligibility).toString();
+		const response = await fetch(`${API_URL}/programs?${queryParams}`);
+
+		if (response.ok) {
+			const { data } = await response.json();
+
+			userObj.eligiblePrograms = data.filteredPrograms;
+		} else {
+			console.error('Failed to fetch programs');
+		}
+	});
 	// For Log in
 	// Pass in Email Password
 	// Ret Json Web token
@@ -24,33 +59,68 @@
 
 {#if SignedIn}
 	<div class="h-screen flex flex-col m-4">
-		<div class="m-4">
+		<div class="m-4 flex  items-center">
 			<Avatar width="w-16" initials="{userObj.firstName[0]}{userObj.lastName[0]}" />
+
+			<h1 class="h1 mx-3">Hello, <b>{userObj.firstName} {userObj.lastName}</b></h1>
 		</div>
-		<h1>Hello, <b>{userObj.firstName} {userObj.lastName}</b></h1>
-		<h1>Email: <b>{userObj.email}</b></h1>
 		<div>
 			{#if userObj.eligiblePrograms.length === 0}
-				<h1>No Eligible Programs</h1>
+				<h1 class="h3 m-3 ">No Eligible Programs</h1>
 			{:else}
-				{userObj.eligiblePrograms}
-			{/if}
-		</div>
-		<div>
-			{#if userObj.registeredPrograms.length === 0}
-				<h1>No Registered Programs</h1>
-			{:else}
-				{userObj.registeredPrograms}
+				<h1 class="h3 m-3 ">Eligible Programs:</h1>
+				<div class="card p-4 grid grid-cols-[auto_1fr_auto] gap-4 items-center">
+					<!-- Button: Left -->
+					<button type="button" class="btn-icon variant-filled" on:click={carouselLeft}>
+						&lt
+					</button>
+					<!-- Full Images -->
+					<div
+						bind:this={elemCarousel}
+						class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto"
+					>
+						{#each userObj.eligiblePrograms as p}
+							<ProgramModal
+								name={p.program_name}
+								jurisdiction={p.jurisdiction}
+								image={p.image}
+								description={p.long_desc}
+							/>
+						{/each}
+					</div>
+					<!-- Button: Right -->
+					<button type="button" class="btn-icon variant-filled" on:click={carouselRight}>
+						&gt
+					</button>
+				</div>
 			{/if}
 		</div>
 		<div>
 			{#if userObj.pendingPrograms.length === 0}
-				<h1>No Pending Programs</h1>
+				<h1 class="h3 m-3 ">No Pending Programs</h1>
+				
 			{:else}
 				{userObj.pendingPrograms}
 			{/if}
 		</div>
+		<div>
+			{#if userObj.registeredPrograms.length === 0}
+				<h1 class="h3 m-3 ">No Registered Programs</h1>
+			{:else}
+				{userObj.registeredPrograms}
+			{/if}
+		</div>
 	</div>
 {:else}
-	<Loading />
+	<div class="h-full flex flex-col justify-center items-center">
+		<a class="btn m-3 variant-outline-primary" href="/Questions">
+			<Icon icon="mdi:file-question" />
+			<p>Take Questionnaire</p></a
+		>
+		<p class="p">or Sign in to see your programs</p>
+		<div class="text-center">
+			<br />
+			<a href="/User/SignIn" class="btn variant-filled">Sign In</a>
+		</div>
+	</div>
 {/if}
