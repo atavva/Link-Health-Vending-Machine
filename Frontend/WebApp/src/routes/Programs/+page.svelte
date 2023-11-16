@@ -2,11 +2,15 @@
 	import { onMount } from 'svelte';
 	import { API_URL } from '$lib/api';
 	import Loading from '$lib/Components/Loading.svelte';
+	import { goto } from '$app/navigation';
 
 	// Noah if your looking at this or anyone
 	// This Needs to be styled and the modal class needs to be linked
 	let programs = null;
 
+	function signUp(){
+		goto('/User')
+	}
 	onMount(async () => {
 		const response = await fetch(API_URL + '/programs');
 		if (response.ok) {
@@ -39,7 +43,7 @@
 					<p>{program.long_desc}</p>
 				</div>
 				<footer class="card-footer flex justify-center">
-					<button class="btn variant-outline-secondary">Sign Up</button>
+					<button on:click={signUp} class="btn variant-outline-secondary">Sign Up</button>
 				</footer>
 			</div>
 		{/each}

@@ -12,8 +12,10 @@
 	let email: string = '';
 	let password: string = '';
 
-	let userObj = $user;
-	$: userObj = $user;
+	let userObj;
+	$: {
+		userObj = $user;
+	}
 
 	onMount(() => {
 		console.log(userObj);
@@ -157,7 +159,7 @@
 				</ul>
 			</Step>
 		</Stepper>
-		<br>
+		<br />
 		<div class="text-center">
 			<p>Already Have an Account?</p>
 			<br />

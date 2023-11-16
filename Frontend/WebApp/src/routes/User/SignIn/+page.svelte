@@ -4,6 +4,10 @@
 	import { user } from '$lib/stores';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Icon from '@iconify/svelte';
+	let userObj
+	$: {
+		userObj = $user;
+	}
 	let isFocused: boolean = true;
 	let email = '';
 	let password = '';
@@ -21,13 +25,11 @@
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log("user")
+			console.log(data);
+			userObj.jwt = data.jwt
+			console.log(userObj)
 			// Add in when Sign in update user object with all known data
-			user.update((current) => {
-				return { ...current, jwt: data.jwt };
-			});
-
-			goto('/User');
+						goto('/User');
 		} else {
 			alert('Login failed');
 		}
@@ -50,7 +52,7 @@
 		</label>
 		<div class="flex justify-between">
 			<button on:click={SignIn} class="btn variant-filled">Sign In</button>
-			<p class="flex p items-center">or </p>
+			<p class="flex p items-center">or</p>
 			<a href="/User/SignUp" class="btn variant-filled">Sign Up</a>
 		</div>
 	</form>
