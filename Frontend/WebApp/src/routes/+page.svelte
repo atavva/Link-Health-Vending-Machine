@@ -9,7 +9,7 @@
 
 <div class="h-full flex flex-col justify-center items-center">
 	<div class="hero">
-		<h1 class="h1">Link Health Vending Machine</h1>
+		<h1 class="h1">Link Health Data Collection</h1>
 	</div>
 	<div class="m-5 p">
 		<p>
@@ -20,5 +20,5 @@
 			labore.
 		</p>
 	</div>
-	<a class="btn m-3 variant-outline-primary" href="/Questions">Take Questionnaire</a>
+	<a class="btn m-3 h3 variant-outline-primary" href="/Questions">Take Questionnaire</a>
 </div>
