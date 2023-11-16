@@ -46,6 +46,11 @@
 		{ label: '简体中文', value: 'chinese(simp)' },
 		{ label: '繁體中文', value: 'chinese(traditional)' }
 	];
+
+	// Testing functions
+	function a() {
+		alert('Not Implemented');
+	}
 	// onMount(drawerStrore.open(drawerSettings));
 </script>
 
@@ -64,7 +69,7 @@
 			{$page.url.pathname.slice(1)}
 			<svelte:fragment slot="trail">
 				<LightSwitch />
-				<Icon icon="ion:language-outline" />
+				<button class="btn card-hover" on:click={a}><Icon icon="ion:language-outline" /></button>
 				<!-- <svg class="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> -->
 				<!-- <path d={languageSVG}></path> -->
 				<!-- </svg> -->

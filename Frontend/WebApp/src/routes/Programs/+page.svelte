@@ -21,10 +21,9 @@
 </script>
 
 {#if programs}
-	<div class="flex flex-wrap m-3">
+	<div class="flex flex-wrap justify-between">
 		{#each programs as program (program.program_id)}
 			<div
-				on:click={openModal}
 				class="flex flex-col justify-between m-4 card card-hover overflow-hidden block w-1/5"
 			>
 				<header class="overflow-hidden" height="10%">
