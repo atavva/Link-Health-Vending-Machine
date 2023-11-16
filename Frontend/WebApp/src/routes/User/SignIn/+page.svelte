@@ -4,7 +4,7 @@
 	import { user } from '$lib/stores';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Icon from '@iconify/svelte';
-	let userObj
+	let userObj;
 	$: {
 		userObj = $user;
 	}
@@ -25,11 +25,11 @@
 
 		if (response.ok) {
 			const data = await response.json();
-			console.log(data);
-			userObj.jwt = data.jwt
-			console.log(userObj)
+			userObj.jwt = data.jwt;
+			userObj.email = email;
+			console.log(userObj);
 			// Add in when Sign in update user object with all known data
-						goto('/User');
+			goto('/User');
 		} else {
 			alert('Login failed');
 		}
