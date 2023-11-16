@@ -7,8 +7,6 @@
 		Drawer,
 		Avatar,
 		LightSwitch,
-		TabAnchor,
-		TabGroup,
 		getDrawerStore,
 		type DrawerSettings,
 		type AutocompleteOption

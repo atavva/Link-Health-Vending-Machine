@@ -22,6 +22,7 @@
 		if (response.ok) {
 			const data = await response.json();
 			console.log("user")
+			// Add in when Sign in update user object with all known data
 			user.update((current) => {
 				return { ...current, jwt: data.jwt };
 			});

@@ -1,7 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
 	import { API_URL } from '$lib/api';
-	import { ProgressRadial } from '@skeletonlabs/skeleton';
 	import Loading from '$lib/Components/Loading.svelte';
 
 	// Noah if your looking at this or anyone
@@ -13,11 +12,9 @@
 		if (response.ok) {
 			const result = await response.json();
 			programs = result.data.filteredPrograms;
+			console.log("Okay res")
 		}
 	});
-	function openModal() {
-		alert('Temp holder for model');
-	}
 </script>
 
 {#if programs}
