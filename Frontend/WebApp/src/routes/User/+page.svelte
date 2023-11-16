@@ -1,22 +1,34 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import Loading from '$lib/Components/Loading.svelte';
+	import { onMount } from 'svelte';
 	import { user } from '$lib/stores';
 	import { Avatar } from '@skeletonlabs/skeleton';
-	let SignedIn = false;
-	let userObj = $user;
-	$: userObj = $user;
-	console.log(userObj, $user);
-	if (userObj.jwt.length > 0) {
-		SignedIn = true;
-	} else {
-		if (browser) {
-			// This is temp it should allow show users to not sign in and see these things (this should only trig if users tries to sign up for a program without being singed in)
-			goto('/User/SignIn');
-		}
-	}
 
+	import Icon from '@iconify/svelte';
+	import { API_URL } from '$lib/api';
+	let SignedIn = false;
+	let filteredPrograms;
+	let userObj: {};
+	$: {
+		userObj = $user;
+	}
+	onMount(async () => {
+		if (Object.keys(userObj.eligibility).length !== 0) {
+			console.log(JSON.stringify(userObj.eligibility));
+		}
+
+		const queryParams = new URLSearchParams(userObj.eligibility).toString();
+		const response = await fetch(`${API_URL}/programs?${queryParams}`);
+
+		if (response.ok) {
+			const { data } = await response.json();
+			filteredPrograms = data.filteredPrograms;
+			console.log(filteredPrograms);
+		} else {
+			console.error('Failed to fetch programs');
+		}
+	});
 	// For Log in
 	// Pass in Email Password
 	// Ret Json Web token
@@ -52,5 +64,15 @@
 		</div>
 	</div>
 {:else}
-	<Loading />
+	<div class="h-full flex flex-col justify-center items-center">
+		<a class="btn m-3 variant-outline-primary" href="/Questions">
+			<Icon icon="mdi:file-question" />
+			<p>Take Questionnaire</p></a
+		>
+		<p class="p">or Sign in to see your programs</p>
+		<div class="text-center">
+		<br>
+			<a href="/User/SignIn" class="btn variant-filled">Sign In</a>
+		</div>
+	</div>
 {/if}

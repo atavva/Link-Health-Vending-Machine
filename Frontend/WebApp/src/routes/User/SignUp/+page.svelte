@@ -2,13 +2,28 @@
 	import { focusTrap, ProgressBar, Stepper, Step } from '@skeletonlabs/skeleton';
 	import { API_URL } from '$lib/api';
 	import { user } from '$lib/stores';
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import Icon from '@iconify/svelte';
+	import { browser } from '$app/environment';
 	let isFocused: boolean = true;
 	let firstName: string = '';
 	let lastName: string = '';
 	let email: string = '';
 	let password: string = '';
 
+	let userObj = $user;
+	$: userObj = $user;
+
+	onMount(() => {
+		console.log(userObj);
+		if (userObj.jwt.length > 0) {
+			console.log('hello');
+			if (browser) {
+				goto('/User');
+			}
+		}
+	});
 	let passwordFeedback = {
 		length: false,
 		lowercase: false,
@@ -91,14 +106,11 @@
 					<span>Last Name</span>
 					<input bind:value={lastName} class="input" type="text" placeholder="Enter last name..." />
 				</label>
-		<div class="text-center">
-					<a href="/User/SignIn" class="btn variant-filled">Sign In</a>
-				</div>
-			
 			</Step>
 			<Step>
 				<svelte:fragment slot="header">Please Input Email</svelte:fragment>
 				<label class="label">
+					<span class="flex items-center"><Icon icon="ic:round-email" /> &nbsp Email</span>
 					<label class="label">
 						<input
 							bind:value={email}
@@ -108,11 +120,11 @@
 						/>
 					</label>
 				</label>
-		</Step>
+			</Step>
 			<Step buttonCompleteLabel="Sign Up">
 				<svelte:fragment slot="header">Please Input a Strong Password</svelte:fragment>
 				<label class="label">
-					<span>Password</span>
+					<span class="flex items-center"><Icon icon="mdi:password" /> &nbsp Passowrd</span>
 					<input
 						bind:value={password}
 						on:change={checkPasswordStrength}
@@ -145,5 +157,11 @@
 				</ul>
 			</Step>
 		</Stepper>
+		<br>
+		<div class="text-center">
+			<p>Already Have an Account?</p>
+			<br />
+			<a href="/User/SignIn" class="btn variant-filled">Sign In</a>
+		</div>
 	</form>
 </div>
