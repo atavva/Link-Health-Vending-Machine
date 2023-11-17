@@ -34,9 +34,9 @@
 		<Fade fadeTime={3 * fadeInterval}>
 			<div>
 				<div class="flex flex-row justify-between items-center gap-7">
-					<a class="btn py-5 h3 variant-outline-primary border-2 rounded-md" href="/Questions">Take Questionnaire</a>
+					<a class="btn py-4 h3 variant-outline-primary border-2 rounded-md" href="/Questions">Take Questionnaire</a>
 					<h5 class="text-xl">OR</h5>
-					<a class="btn py-5 h3 variant-outline-primary border-2 rounded-md" href="/User">Create an Account</a>
+					<a class="btn py-4 h3 variant-outline-primary border-2 rounded-md" href="/User">Create an Account</a>
 				</div>
 				<p class="py-1">Fast and Secure</p>
 			</div>

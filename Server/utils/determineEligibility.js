@@ -43,6 +43,7 @@ const determineEligibility = (eligibility, requirements) => {
  * @returns {boolean} whether the user's eligibility meets this rule
  */
 const evaluateRule = (eligibility, rule) => {
+
   // First, check if the eligibility object has the rule's fieldName
   if (!(rule.fieldName in eligibility)) {
     return false;
@@ -54,7 +55,7 @@ const evaluateRule = (eligibility, rule) => {
   // Check eligibility by case
   switch (rule.comparisonOperator) {
     case "=":
-      return userVal == String(rule.value);
+      return String(userVal) == String(rule.value);
     case "<=":
       return userVal <= rule.value;
     case ">=":

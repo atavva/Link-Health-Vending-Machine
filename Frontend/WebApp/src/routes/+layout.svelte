@@ -76,7 +76,7 @@
 		<!-- App Bar -->
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
 			<svelte:fragment slot="lead">
-				<a href="/"><img src="" alt="Link Health Icon" /></a>
+				<a href="/" class="w-12"><img src="https://i0.wp.com/link-health.org/wp-content/uploads/2022/10/link-transparent-logo-4.png?fit=460%2C449&ssl=1" alt="Link Health Icon" /></a>
 			</svelte:fragment>
 			{$page.url.pathname.slice(1)}
 			<svelte:fragment slot="trail">

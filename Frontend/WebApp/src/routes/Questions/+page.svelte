@@ -3,16 +3,18 @@
 	import Loading from '$lib/Components/Loading.svelte';
 	import { API_URL } from '$lib/api';
 	import { user } from '$lib/stores';
-	import { ProgressBar } from '@skeletonlabs/skeleton';
+	import { ProgressBar, RadioItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
+	import { RadioGroup } from '@skeletonlabs/skeleton';
 	let question: {
 		maxRemainingQuestions: number;
-		questionInfo: { Question: any; expected_type: string; field_name: string };
+		questionInfo: { Question: any; expected_type: string; field_name: string, description: string };
 	} | null = null;
 	let questionsAsked = 0;
 	let questionsRemaining = 0;
 	let loadingNextQuestion = false;
 	let ineligiblePrograms: number[] = [];
+	let percentageCompleted = 0;
 	let answer: any;
 	let isChecked = false;
 
@@ -23,8 +25,14 @@
 
 	function updateAll() {
 		const newData: { [key: string]: any } = {};
+		if (answer == "Yes") {
+			answer = true
+		} else if (answer == "No") {
+			answer = false
+		}
 		newData[question?.questionInfo.field_name!] = answer;
 		userObj.eligibility = { ...userObj.eligibility, ...newData };
+		console.log(userObj);
 		getNextQuestion();
 		answer = '';
 	}
@@ -71,18 +79,19 @@
 			// 	updateUser(question);
 			// }
 			const result = await response.json();
+			console.log(result);
 			if (result.data.maxRemaningQuestions == 0 || result.data.maxRemaningQuestions == null) {
 			}
 			loadingNextQuestion = false;
 			question = result.data;
 			questionsAsked += 1;
 			questionsRemaining = questionsAsked + question.maxRemainingQuestions;
-			if (questionsAsked == questionsRemaining) {
+			percentageCompleted = question.percentageCompleted;
+			if (questionsAsked == questionsRemaining || !question?.maxRemainingQuestions) {
 				updateUser();
 				goto('/User');
 			}
 
-			console.log({ QA: questionsAsked, QR: questionsRemaining });
 		} else {
 			alert('error');
 		}
@@ -98,11 +107,18 @@
 			{#if question.questionInfo.expected_type == 'Number'}
 				<input type="number" class="input" bind:value={answer} />
 			{:else if question.questionInfo.expected_type == 'Boolean'}
-				<p>
-					<input class="checkbox" type="checkbox" bind:checked={isChecked} />{isChecked
-						? '\tYes'
-						: '\tNo'}
-				</p>
+			<div>
+				<RadioGroup display="flex">
+					<RadioItem bind:group={answer} name="yes" value={true}>Yes</RadioItem>
+					<RadioItem bind:group={answer} name="no" value={false}>No</RadioItem>
+				</RadioGroup>
+			</div>
+			{:else if question.questionInfo.expected_type.startsWith("Option")}
+				<select class="select" bind:value={answer}>
+					{#each question.questionInfo.expected_type.split("Option ")[1].split("|") as option}
+						<option value={option}>{option}</option>
+					{/each}
+				</select>
 			{:else}
 				<input type="text" bind:value={answer} />
 			{/if}
@@ -111,12 +127,15 @@
 				<ProgressBar
 					transition="transition-all"
 					label="Progress Bar"
-					max={questionsRemaining}
-					value={questionsAsked}
+					max={1}
+					value={percentageCompleted}
 				/>
 			{:else}
 				<ProgressBar transition="transition-all" label="Progress Bar" max={1} value={1} />
 			{/if}
+		</div>
+		<div>
+			<p>{question.questionInfo.description}</p>
 		</div>
 	{:else}
 		<Loading />

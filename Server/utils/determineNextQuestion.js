@@ -1,6 +1,8 @@
 const { isRule, evaluateRule } = require("./determineEligibility");
+const detemineEligibility = require('./determineEligibility');
 
 module.exports = (unknownPrograms, eligibility) => {
+
   
   //Eliminate Null values from eligibility
   Object.keys(eligibility).forEach((key) => {
@@ -9,8 +11,25 @@ module.exports = (unknownPrograms, eligibility) => {
     }
   });
 
+  let finalUnknownPrograms;
+
+  if (Object.keys(eligibility).length != 0) {
+    const eligiblePrograms = detemineEligibility(eligibility, unknownPrograms);
+
+    finalUnknownPrograms = [];
+
+    unknownPrograms.forEach((program) => {
+      if (eligiblePrograms.indexOf(program) == -1) {
+        finalUnknownPrograms.push(program);
+      }
+    })
+
+  } else {
+    finalUnknownPrograms = unknownPrograms;
+  }
+
   //Clean the programs
-  const cleanedPrograms = simplifyPrograms(unknownPrograms, eligibility);
+  const cleanedPrograms = simplifyPrograms(finalUnknownPrograms, eligibility);
 
   const finalPrograms = [];
   cleanedPrograms.forEach((program) => {
@@ -51,7 +70,7 @@ const evaluateBestQuestion = (cleanedPrograms) => {
       addScores(currScores, newScores);
     });
   }
-
+  
   return currScores;
 };
 

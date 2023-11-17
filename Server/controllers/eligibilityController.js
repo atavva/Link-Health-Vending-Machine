@@ -85,10 +85,12 @@ exports.determineNextQuestion = catchAsync(async (req, res, next) => {
     delete bestNextEligibilityScores[bestNextFieldName];
   }
 
-  if ("status" in questionInfo) {
-    return next(
-      new AppError(questionInfo.error.message, questionInfo.error.status)
-    );
+  if (questionInfo) {
+    if ("status" in questionInfo) {
+      return next(
+        new AppError(questionInfo.error.message, questionInfo.error.status)
+      );
+    }
   }
 
   const { data: totalCountData, error: totalCountError } = await supabase
