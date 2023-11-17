@@ -12,8 +12,19 @@
 		type AutocompleteOption
 	} from '@skeletonlabs/skeleton';
 	import { page } from '$app/stores';
+	import { user } from '$lib/stores';
+	// Floating UI for Popups
+	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
+	import { storePopup } from '@skeletonlabs/skeleton';
+	import { onMount } from 'svelte';
+	import { slide } from 'svelte/transition';
 	// Icons
 	import Icon from '@iconify/svelte';
+	// User Object
+	let userObj: {};
+	$: {
+		userObj = $user;
+	}
 	// Drawer
 	import { initializeStores } from '@skeletonlabs/skeleton';
 	initializeStores();
@@ -29,11 +40,7 @@
 	function triggerDrawer() {
 		drawerStrore.open(drawerSettings);
 	}
-	// Floating UI for Popups
-	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
-	import { storePopup } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
-	import { slide } from 'svelte/transition';
+
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 	let currentTile: number = 0;
 
@@ -49,7 +56,14 @@
 	function a() {
 		alert('Not Implemented');
 	}
-	// onMount(drawerStrore.open(drawerSettings));
+
+	let SignedIn: bool = false;
+	onMount(() => {
+		// drawerStrore.open(drawerSettings)
+		if (userObj.jwt.length > 0) {
+			SignedIn = true;
+		}
+	});
 </script>
 
 <svelte:head
@@ -81,9 +95,8 @@
 	<Drawer>
 		<div class="w-full flex flex-col items-center justify-center p-3">
 			<a href="/User/Settings">
-				<Avatar class="m-4">
-					<h1>Name</h1>
-				</Avatar>
+				<Avatar class="m-4" 
+				initials="{userObj.firstName[0]}{userObj.lastName[0]}" />
 			</a>
 			<div class="flex flex-col">
 				<a class="btn m-3 variant-outline-primary" href="/Programs">
@@ -98,11 +111,17 @@
 					<Icon icon="mdi:file-question" />
 					<p>Take Questionnaire</p></a
 				>
-
-				<div class="flex m-auto">
-					<a class="btn variant-ringed m-3" href="/User/SignUp">Sigh Up</a>
-					<a class="btn variant-ringed m-3" href="/User/SignIn">Sign in</a>
-				</div>
+				{#if !SignedIn}
+					<div class="flex m-auto">
+						<a class="btn variant-ringed m-3" href="/User/SignUp">Sigh Up</a>
+						<a class="btn variant-ringed m-3" href="/User/SignIn">Sign in</a>
+					</div>
+				{:else}
+					<a class="btn m-3 variant-outline-primary" href="/User/Settings">
+						<Icon icon="uil:setting" />
+						<p>Edit Profile</p></a
+					>
+				{/if}
 			</div>
 		</div>
 	</Drawer>

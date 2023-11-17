@@ -1,14 +1,12 @@
+<!-- sign in page from WebApp -->
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { API_URL } from '$lib/api';
+	// import { API_URL } from '$lib/api';
 	import { user } from '$lib/stores';
 	import { focusTrap } from '@skeletonlabs/skeleton';
 	import Icon from '@iconify/svelte';
-	let userObj;
-	$: {
-		userObj = $user;
-	}
 	let isFocused: boolean = true;
+    let API_URL = 'http://127.0.0.1:3000/api';
 	let email = '';
 	let password = '';
 	async function SignIn() {
@@ -25,19 +23,17 @@
 
 		if (response.ok) {
 			const data = await response.json();
-			userObj.jwt = data.jwt;
-			userObj.email = email;
-			console.log(userObj);
-			// Add in when Sign in update user object with all known data
-			goto('/User');
+			console.log("user")
+			user.update((current) => {
+				return { ...current, jwt: data.jwt };
+			});
+
+			goto('/+layout');
 		} else {
 			alert('Login failed');
 		}
 	}
 
-	// Same
-	// Passowrd Strentgh
-	// Repeate
 </script>
 
 <div class="h-full flex justify-center items-center">
@@ -47,13 +43,11 @@
 			<input bind:value={email} class="input" type="email" placeholder="Enter email address..." />
 		</label>
 		<label class="label">
-			<span class="flex items-center"><Icon icon="mdi:password" /> &nbsp Passowrd</span>
+			<span class="flex items-center"><Icon icon="mdi:password" /> &nbsp Password</span>
 			<input bind:value={password} class="input" type="password" placeholder="Enter password..." />
 		</label>
 		<div class="flex justify-between">
 			<button on:click={SignIn} class="btn variant-filled">Sign In</button>
-			<p class="flex p items-center">or</p>
-			<a href="/User/SignUp" class="btn variant-filled">Sign Up</a>
 		</div>
 	</form>
 </div>

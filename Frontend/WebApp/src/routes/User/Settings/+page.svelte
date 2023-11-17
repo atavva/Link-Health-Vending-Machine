@@ -2,7 +2,7 @@
 	import Loading from '$lib/Components/Loading.svelte';
 	import { API_URL, fetchFields } from '$lib/api';
 	import { user } from '$lib/stores';
-	import { focusTrap, ProgressRadial } from '@skeletonlabs/skeleton';
+	import { Avatar, focusTrap, ProgressRadial } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	let isFocused: boolean = true;
 	// For Log in
@@ -11,6 +11,7 @@
 	let userObj: {};
 	$: {
 		userObj = $user;
+		console.log(userObj);
 	}
 
 	onMount(() => console.log(userObj));
@@ -37,10 +38,90 @@
 
 <div class="h-full flex flex-col justify-center items-center">
 	{#if userObj.eligibility != {}}
-		<div class="flex w-4/5 flex-col bg-surface-800 p-3">
-			{#each Object.entries(userObj.eligibility) as [field, value]}
+		<div class="flex w-4/5 m-2 flex-col bg-surface-800 p-3">
+			<Avatar class="m-auto" initials="{userObj.firstName[0]}{userObj.lastName[0]}" />
+			<!-- {#each Object.entries(userObj) as [field, value]}
 				<h1 class="m-2">{field.toUpperCase()}: {value === null ? 'No data' : value}</h1>
-			{/each}
+			{/each} -->
+			<form>
+				<label class="label">
+					Email:
+					<input
+						type="email"
+						class="input"
+						placeholder={userObj.email}
+						bind:value={userObj.email}
+					/>
+				</label>
+				<label class="label">
+					First Name:
+					<input
+						type="text"
+						class="input"
+						placeholder={userObj.firstName}
+						bind:value={userObj.firstName}
+					/>
+				</label>
+				<label class="label">
+					Last Name:
+					<input
+						type="text"
+						class="input"
+						placeholder={userObj.lastName}
+						bind:value={userObj.lastName}
+					/>
+				</label>
+				<label class="label">
+					Language:
+					<textarea class="textarea" bind:value={userObj.language} />
+				</label>
+				<br>
+				<hr />
+				<br>
+				<fieldset>
+					<legend class="h3">Eligibility Info:</legend>
+					<label class="label">
+						AGI:
+						<input
+							type="number"
+							class="input"
+							placeholder={userObj.eligibility.agi}
+							bind:value={userObj.eligibility.agi}
+						/>
+					</label>
+					<label class="label">
+						Poverty Level:
+						<input
+							type="number"
+							class="input"
+							step="0.1"
+							placeholder={userObj.eligibility.poverty_level}
+							bind:value={userObj.eligibility.poverty_level}
+						/>
+					</label>
+					<label class="label">
+						Age:
+						<input
+							type="number"
+							class="input"
+							placeholder={userObj.eligibility.age}
+							bind:value={userObj.eligibility.age}
+						/>
+					</label>
+					<label class="label">
+						Dependents:
+						<input
+							type="number"
+							class="input"
+							placeholder={userObj.eligibility.dependents}
+							bind:value={userObj.eligibility.dependents}
+						/>
+					</label>
+				</fieldset>
+			</form>
+				<br>
+				<hr />
+				<br>
 			<button on:click={deleteUser} class="btn variant-filled-error">Delete Account</button>
 		</div>
 	{:else}
