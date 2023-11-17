@@ -114,24 +114,22 @@ exports.verifyAdmin = catchAsync(async (req, res, next) => {
   next();
 });
 
-exports.adminStats = catchAsync(async(req, res, next) => {
-
-  const programs = await allPrograms(adminAccess = true);
+exports.adminStats = catchAsync(async (req, res, next) => {
+  const programs = await allPrograms((adminAccess = true));
 
   if (!programs) {
     res.status(404).json({
-      'status': 'fail',
-      'message': 'Unable to retrieve programs'
+      status: "fail",
+      message: "Unable to retrieve programs",
     });
   }
 
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
-      programs
+      programs,
     },
-  })
-
+  });
 });
 
 exports.adminGetUsers = catchAsync(async (req, res, next) => {
@@ -192,6 +190,8 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
 
   const newRegisteredPrograms = req.body["registeredPrograms"];
 
+  const currPendingPrograms = selectData[0]["pending_programs"];
+
   if (!newRegisteredPrograms) {
     return res.status(400).json({
       status: "fail",
@@ -217,6 +217,10 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
   const finalRegisteredPrograms = [
     ...new Set([...currRegisteredPrograms, ...newRegisteredPrograms]),
   ];
+
+  const finalPendingPrograms = currPendingPrograms.filter((id) => {
+    return newRegisteredPrograms.indexOf(id) == -1;
+  });
 
   for (let i = 0; i < newRegisteredPrograms.length; i++) {
     newRegisteredPrograms[i] = String(newRegisteredPrograms[i]);
@@ -260,6 +264,14 @@ exports.adminUpdateRegisteredPrograms = catchAsync(async (req, res, next) => {
   if (patchError) {
     return next(new AppError(patchError.message), 500);
   }
+
+  const { data: pendingData, error: pendingError } = await supabase
+    .from("profiles")
+    .update({
+      pending_programs: finalPendingPrograms,
+    })
+    .eq("id", uid)
+    .select();
 
   res.status(201).json({
     status: "success",
@@ -587,6 +599,67 @@ exports.patchRegisteredPrograms = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.patchPendingPrograms = catchAsync(async (req, res, next) => {
+  const supabase = req.authClient;
+
+  const { data: selectData, error: selectError } = await supabase
+    .from("profiles")
+    .select("pending_programs");
+
+  if (selectError) {
+    return next(new AppError("Failure to select information", 500));
+  }
+
+  const currPendingPrograms = selectData[0]["pending_programs"];
+
+  const newPendingPrograms = req.body["pendingPrograms"];
+
+  if (!newPendingPrograms) {
+    return res.status(400).json({
+      status: "fail",
+      error: "invalidDataError",
+      message:
+        "Please input new pending program data into req.body.pendingPrograms",
+    });
+  }
+
+  if (!Array.isArray(newPendingPrograms)) {
+    return res.status(400).json({
+      status: "fail",
+      error: "invalidDataError",
+      message:
+        "Please format new pending program data as a list of program IDs",
+    });
+  }
+
+  for (let i = 0; i < newPendingPrograms.length; i++) {
+    newPendingPrograms[i] = String(newPendingPrograms[i]);
+  }
+
+  const finalPendingPrograms = [
+    ...new Set([...currPendingPrograms, ...newPendingPrograms]),
+  ];
+
+  const { data: patchData, error: patchError } = await supabase
+    .from("profiles")
+    .update({
+      pending_programs: finalPendingPrograms,
+    })
+    .eq("id", req.jwt.sub)
+    .select();
+
+  if (patchError) {
+    return next(new AppError(patchError.message), 500);
+  }
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      pending_programs: patchData[0].pending_programs,
+    },
+  });
+});
+
 exports.deleteEligibility = catchAsync(async (req, res, next) => {
   const supabase = req.authClient;
 
@@ -797,6 +870,67 @@ exports.deleteRegisteredPrograms = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.deletePendingPrograms = catchAsync(async (req, res, next) => {
+  const supabase = req.authClient;
+
+  const { data: selectData, error: selectError } = await supabase
+    .from("profiles")
+    .select("pending_programs");
+
+  if (selectError) {
+    return next(new AppError("Failure to select information", 500));
+  }
+
+  const currPendingPrograms = selectData[0]["pending_programs"];
+
+  const deletedPendingPrograms = req.body["pendingPrograms"];
+
+  if (!deletedPendingPrograms) {
+    return res.status(400).json({
+      status: "fail",
+      error: "invalidDataError",
+      message:
+        "Please input deleted eligibile program data into req.body.pendingPrograms",
+    });
+  }
+
+  if (!Array.isArray(deletedPendingPrograms)) {
+    return res.status(400).json({
+      status: "fail",
+      error: "invalidDataError",
+      message:
+        "Please format deleted pending program data as a list of program IDs",
+    });
+  }
+
+  for (let i = 0; i < deletedPendingPrograms.length; i++) {
+    deletedPendingPrograms[i] = String(deletedPendingPrograms[i]);
+  }
+
+  const finalPendingPrograms = currPendingPrograms.filter((id) => {
+    return !deletedPendingPrograms.includes(id);
+  });
+
+  const { data: patchData, error: patchError } = await supabase
+    .from("profiles")
+    .update({
+      pending_programs: finalPendingPrograms,
+    })
+    .eq("id", req.jwt.sub)
+    .select();
+
+  if (patchError) {
+    return next(new AppError(patchError.message), 500);
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      pending_programs: patchData[0].pending_programs,
+    },
+  });
+});
+
 // POST login user
 exports.login = catchAsync(async (req, res, next) => {
   // Get the info about the user who is trying to log in
@@ -819,14 +953,24 @@ exports.login = catchAsync(async (req, res, next) => {
       "Set-Cookie": `jwt=${jwtToken}; HttpOnly; Secure; SameSite=None; Max-Age=7200000`,
     });
 
+    const uid = data.user.id;
+
+    const serviceRoleClient = createServiceRoleClient();
+    const { data: userData, error: userError } = await serviceRoleClient
+      .from("profiles")
+      .select("*")
+      .eq("id", uid);
+
     if (process.env.NODE_ENV == "development") {
       res.status(201).json({
         status: "success",
         jwt: jwtToken,
+        ...userData[0],
       });
     } else {
       res.status(201).json({
         status: "success",
+        ...userData[0],
       });
     }
   }
@@ -849,5 +993,13 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "User successfully deleted",
+  });
+});
+
+exports.isAdmin = catchAsync(async (req, res, next) => {
+  res.status(200).json({
+    status: "success",
+    message: "User is admin",
+    isAdmin: true,
   });
 });

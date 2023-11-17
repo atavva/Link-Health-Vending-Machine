@@ -15,12 +15,21 @@ const {
   verifyAdmin,
   adminGetUsers,
   adminUpdateRegisteredPrograms,
-  adminStats
+  adminStats,
+  isAdmin,
+  patchPendingPrograms,
+  deletePendingPrograms,
 } = require("../controllers/userController");
 
 const router = express.Router();
 
 router.route("/").all(verifySession).get(getUser).delete(deleteUser);
+
+router
+  .route("/pending-programs")
+  .all(verifySession)
+  .patch(patchPendingPrograms)
+  .delete(deletePendingPrograms);
 
 router
   .route("/eligibility")
@@ -43,6 +52,8 @@ router
 router.route("/admin").all(verifySession, verifyAdmin).get(adminGetUsers);
 
 router.route("/admin/stats").all(verifySession, verifyAdmin).get(adminStats);
+
+router.route("/admin/isAdmin").all(verifySession, verifyAdmin).get(isAdmin);
 
 router
   .route("/admin/:id")
