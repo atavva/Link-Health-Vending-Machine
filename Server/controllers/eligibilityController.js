@@ -125,8 +125,17 @@ const determineUnknownPrograms = async (
   // Get the programs
   const programs = await allPrograms();
 
+  let determinedPrograms;
   // combine the eligible and ineligiblePrograms
-  const determinedPrograms = eligiblePrograms.concat(ineligiblePrograms);
+  if (eligiblePrograms && ineligiblePrograms) {
+    determinedPrograms = eligiblePrograms.concat(ineligiblePrograms);
+  } else if (eligiblePrograms) {
+    determinedPrograms = eligiblePrograms;
+  } else if (ineligiblePrograms) {
+    determinedPrograms = ineligiblePrograms;
+  } else {
+    determinedPrograms = [];
+  }
 
   const unknownPrograms = programs.filter((program) => {
     return !determinedPrograms.includes(program.program_id);
