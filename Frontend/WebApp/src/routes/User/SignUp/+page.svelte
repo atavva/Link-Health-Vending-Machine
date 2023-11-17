@@ -7,14 +7,12 @@
 	import Icon from '@iconify/svelte';
 	import { browser } from '$app/environment';
 	let isFocused: boolean = true;
-	let firstName: string = '';
-	let lastName: string = '';
-	let email: string = '';
 	let password: string = '';
 
 	let userObj;
 	$: {
 		userObj = $user;
+		console.log(userObj);
 	}
 
 	onMount(() => {
@@ -63,10 +61,10 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				firstName,
-				lastName,
-				email,
-				password
+				firstName: userObj.firstName,
+				lastName: userObj.lastName,
+				email: userObj.email,
+				password: password
 			})
 		});
 
@@ -76,13 +74,10 @@
 				return {
 					...current,
 					jwt: data.jwt,
-					firstName: firstName,
-					lastName: lastName,
-					email: email
 				};
 			});
 
-			goto('/User');
+			goto('/Questions');
 		} else {
 			alert('Signup failed, please try again');
 		}
@@ -97,7 +92,7 @@
 				<label class="label">
 					<span>First Name</span>
 					<input
-						bind:value={firstName}
+						bind:value={userObj.firstName}
 						class="input"
 						type="text"
 						placeholder="Enter first name..."
@@ -106,7 +101,7 @@
 
 				<label class="label">
 					<span>Last Name</span>
-					<input bind:value={lastName} class="input" type="text" placeholder="Enter last name..." />
+					<input bind:value={userObj.lastName} class="input" type="text" placeholder="Enter last name..." />
 				</label>
 			</Step>
 			<Step>
@@ -115,7 +110,7 @@
 					<span class="flex items-center"><Icon icon="ic:round-email" /> &nbsp Email</span>
 					<label class="label">
 						<input
-							bind:value={email}
+							bind:value={userObj.email}
 							class="input"
 							type="email"
 							placeholder="Enter email address..."
