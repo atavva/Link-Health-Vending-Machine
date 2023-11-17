@@ -58,12 +58,17 @@ exports.getAllPrograms = catchAsync(async (req, res, next) => {
 exports.getProgramById = catchAsync(async (req, res, next) => {
   // Get the requested ID
   const id = req.params.id;
-  const programs = await allPrograms();
+  //const programs = await allPrograms();
   // Filter the programs to the existing ID
   /* YOUR CODE HERE */
-  const program = programs.find((program) => program.program_id == id);
+  //const program = programs.find((program) => program.program_id == id);
+  const { data: program, error } = await supabase.from('programs').select('*').eq('program_id', id).single();
   // Raise an error if that program doesn't exist
   /* YOUR CODE HERE */
+  if (error) {
+    return next(new AppError('Error fetching program from Supabase', 500));
+  }
+
   if (!program) {
     return next(new AppError("Program not found", 404));
   }
