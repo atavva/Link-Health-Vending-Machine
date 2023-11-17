@@ -57,7 +57,8 @@
 
 <div class="h-full flex flex-col justify-center items-center">
 	{#if userObj.eligibility != {}}
-		<div class="flex w-4/5 m-2 flex-col bg-surface-800 p-3">
+		<div class="flex w-4/5 m-2 flex-col variant-form-material
+		 p-3">
 			<!-- <Avatar class="m-auto" initials="{userObj.firstName[0]}{userObj.lastName[0]}" /> -->
 			<!-- {#each Object.entries(userObj) as [field, value]}
 				<h1 class="m-2">{field.toUpperCase()}: {value === null ? 'No data' : value}</h1>
