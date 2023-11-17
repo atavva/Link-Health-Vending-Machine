@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { API_URL } from '$lib/api';
 	import { user } from '$lib/stores';
 	let userObj: {};
@@ -12,30 +13,33 @@
 	export let description: string = '';
 
 	async function signUpToProgram() {
-		console.log(userObj)
-		let temp = userObj.registeredPrograms.slice(); // Logic needs to be put in
-		temp.push(programID);
-		const response = await fetch(API_URL + '/users/registered-programs', {
-			method: 'PATCH',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization' : `Bearer ${userObj.jwt}`
-			},
-			body: JSON.stringify({
-				registeredPrograms: temp
-			})
-		});
+		console.log(userObj);
+		if (userObj.email !== '') {
+			let temp = userObj.registeredPrograms.slice(); // Logic needs to be put in
+			temp.push(programID);
+			const response = await fetch(API_URL + '/users/registered-programs', {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${userObj.jwt}`
+				},
+				body: JSON.stringify({
+					registeredPrograms: temp
+				})
+			});
 
-		if (response.ok) {
-			const data = await response.json();
-			console.log('Signed up for program' + programID);
-			userObj.registeredPrograms.push(programID);
-			console.log(userObj);
-			return data;
+			if (response.ok) {
+				const data = await response.json();
+				console.log('Signed up for program' + programID);
+				userObj.registeredPrograms.push(programID);
+				console.log(userObj);
+				return data;
+			} else {
+				throw new Error('Failed to register to program');
+			}
 		} else {
-			throw new Error('Failed to register to program');
+			goto('/User/SignIn');
 		}
-
 		// Some post method
 	}
 </script>

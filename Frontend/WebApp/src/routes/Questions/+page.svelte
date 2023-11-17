@@ -25,8 +25,6 @@
 		const newData: { [key: string]: any } = {};
 		newData[question?.questionInfo.field_name!] = answer;
 		userObj.eligibility = { ...userObj.eligibility, ...newData };
-		console.log(userObj);
-		console.log($user);
 		getNextQuestion();
 		answer = '';
 	}
@@ -64,8 +62,6 @@
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				eligiblePrograms: userObj.eligiblePrograms,
-				ineligiblePrograms: ineligiblePrograms,
 				eligibility: userObj.eligibility
 			})
 		});
