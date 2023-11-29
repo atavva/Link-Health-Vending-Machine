@@ -4,30 +4,30 @@
 	import { API_URL } from '$lib/api';
 	import { onMount } from 'svelte';
 	import { tableMapperValues } from '@skeletonlabs/skeleton';
+	import AdminLayout from '$lib/Components/adminLayout.svelte';
 	let getstats = {};
 
-
-    function openUserCard(meta: unknown):void {
-        console.log(meta)
-    }
+	function openUserCard(meta: unknown): void {
+		console.log(meta);
+	}
 
 	const sourceData = [
-		{ position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H' },
-		{ position: 2, name: 'Helium', weight: 4.0026, symbol: 'He' },
-		{ position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li' },
-		{ position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be' },
-		{ position: 5, name: 'Boron', weight: 10.811, symbol: 'B' }
+		{ id: 1, name: 'John Applesead', email: 'goodEmail@proton.com', programs: '1,3,4,9' },
+		{ id: 2, name: 'John Applesead', email: 'goodEmail@proton.com', programs: '2,4,9' },
+		{ id: 3, name: 'John Applesead', email: 'goodEmail@proton.com', programs: '1,4,6,7' },
+		{ id: 4, name: 'John Applesead', email: 'goodEmail@proton.com', programs: '1,2,4,9' },
+		{ id: 5, name: 'John Applesead', email: 'goodEmail@proton.com', programs: '1,2,4,9' }
 	];
 
 	const tableSimple: TableSource = {
 		// A list of heading labels.
 		head: ['id', 'Name', 'Email', 'Programs'],
 		// The data visibly shown in your table body UI.
-		body: tableMapperValues(sourceData, ['name', 'symbol', 'weight']),
+		body: tableMapperValues(sourceData, ['id', 'name', 'email', 'programs']),
 		// Optional: The data returned when interactive is enabled and a row is clicked.
 		meta: tableMapperValues(sourceData, ['position', 'name', 'symbol', 'weight']),
 		// Optional: A list of footer labels.
-		foot: ['Total', '', '<code class="code">5</code>']
+		// foot: ['Total', '', '<code class="code">5</code>']
 	};
 
 	onMount(async () => {
@@ -41,6 +41,7 @@
 	});
 </script>
 
-<div class="h-full m-3 flex flex-col  items-center">
+<AdminLayout />
+<div class="h-full m-3 flex flex-col items-center">
 	<Table source={tableSimple} interactive={true} on:selected={openUserCard} />
 </div>

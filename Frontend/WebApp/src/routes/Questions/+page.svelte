@@ -88,7 +88,7 @@
 			questionsRemaining = questionsAsked + question.maxRemainingQuestions;
 			percentageCompleted = question.percentageCompleted;
 			if (questionsAsked == questionsRemaining || !question?.maxRemainingQuestions) {
-				updateUser();
+				// updateUser();
 				goto('/User');
 			}
 

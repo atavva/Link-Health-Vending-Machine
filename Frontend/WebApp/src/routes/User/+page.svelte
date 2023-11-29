@@ -29,6 +29,7 @@
 	}
 
 	let SignedIn = false;
+	// let SignedIn = true
 	let filteredPrograms;
 	let userObj: {};
 	$: {
@@ -45,7 +46,6 @@
 			const { data } = await loginResponse.json();
 			SignedIn = true;
 		} else {
-			SignedIn = false;
 		}
 
 		const queryParams = new URLSearchParams(userObj.eligibility).toString();
