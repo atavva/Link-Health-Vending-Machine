@@ -6,9 +6,12 @@
 	import { ProgressBar, RadioItem } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import { RadioGroup } from '@skeletonlabs/skeleton';
+	import { popup } from '@skeletonlabs/skeleton';
+	import Icon from '@iconify/svelte';
+	import type { PopupSettings } from '@skeletonlabs/skeleton';
 	let question: {
 		maxRemainingQuestions: number;
-		questionInfo: { Question: any; expected_type: string; field_name: string, description: string };
+		questionInfo: { Question: any; expected_type: string; field_name: string; description: string };
 	} | null = null;
 	let questionsAsked = 0;
 	let questionsRemaining = 0;
@@ -23,12 +26,18 @@
 		userObj = $user;
 	}
 
+	const popupHover: PopupSettings = {
+		event: 'hover',
+		target: 'popupHover',
+		placement: 'top'
+	};
+
 	function updateAll() {
 		const newData: { [key: string]: any } = {};
-		if (answer == "Yes") {
-			answer = true
-		} else if (answer == "No") {
-			answer = false
+		if (answer == 'Yes') {
+			answer = true;
+		} else if (answer == 'No') {
+			answer = false;
 		}
 		newData[question?.questionInfo.field_name!] = answer;
 		userObj.eligibility = { ...userObj.eligibility, ...newData };
@@ -82,16 +91,15 @@
 			console.log(result);
 			if (result.data.maxRemaningQuestions == 0 || result.data.maxRemaningQuestions == null) {
 			}
-			loadingNextQuestion = false;
 			question = result.data;
 			questionsAsked += 1;
 			questionsRemaining = questionsAsked + question.maxRemainingQuestions;
 			percentageCompleted = question.percentageCompleted;
-			if (questionsAsked == questionsRemaining || !question?.maxRemainingQuestions) {
+			if (questionsAsked == questionsRemaining || question?.maxRemainingQuestions == null) {
 				// updateUser();
-				goto('/User');
+				window.location.href = '/User';
 			}
-
+			loadingNextQuestion = false;
 		} else {
 			alert('error');
 		}
@@ -101,21 +109,31 @@
 </script>
 
 <div class="h-full flex flex-col justify-center items-center">
+	{#if loadingNextQuestion == false}
 	{#if question}
 		<div class="m-4 flex flex-col card w-fit p-8 text-token space-y-4">
+			<button class="btn variant-filled [&>*]:pointer-events-none" use:popup={popupHover}>
+				<Icon icon="mdi:information-outline" />
+			</button>
+
 			<h1 class="text-center">{question.questionInfo.Question}</h1>
+			<div class="card p-4 variant-filled" data-popup="popupHover">
+				<p>{question.questionInfo.description}</p>
+				<div class="arrow variant-filled" />
+			</div>
+
 			{#if question.questionInfo.expected_type == 'Number'}
 				<input type="number" class="input" bind:value={answer} />
 			{:else if question.questionInfo.expected_type == 'Boolean'}
-			<div>
-				<RadioGroup display="flex">
-					<RadioItem bind:group={answer} name="yes" value={true}>Yes</RadioItem>
-					<RadioItem bind:group={answer} name="no" value={false}>No</RadioItem>
-				</RadioGroup>
-			</div>
-			{:else if question.questionInfo.expected_type.startsWith("Option")}
+				<div>
+					<RadioGroup display="flex">
+						<RadioItem bind:group={answer} name="yes" value={true}>Yes</RadioItem>
+						<RadioItem bind:group={answer} name="no" value={false}>No</RadioItem>
+					</RadioGroup>
+				</div>
+			{:else if question.questionInfo.expected_type.startsWith('Option')}
 				<select class="select" bind:value={answer}>
-					{#each question.questionInfo.expected_type.split("Option ")[1].split("|") as option}
+					{#each question.questionInfo.expected_type.split('Option ')[1].split('|') as option}
 						<option value={option}>{option}</option>
 					{/each}
 				</select>
@@ -134,10 +152,12 @@
 				<ProgressBar transition="transition-all" label="Progress Bar" max={1} value={1} />
 			{/if}
 		</div>
-		<div>
-			<p>{question.questionInfo.description}</p>
-		</div>
+		<div />
 	{:else}
 		<Loading />
 	{/if}
+{:else}
+		<Loading />
+	{/if}
+
 </div>

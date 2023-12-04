@@ -16,6 +16,9 @@
 	// Floating UI for Popups
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from '@floating-ui/dom';
 	import { storePopup } from '@skeletonlabs/skeleton';
+
+	storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
+
 	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 	// Icons
@@ -76,7 +79,12 @@
 		<!-- App Bar -->
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end">
 			<svelte:fragment slot="lead">
-				<a href="/" class="w-12"><img src="https://i0.wp.com/link-health.org/wp-content/uploads/2022/10/link-transparent-logo-4.png?fit=460%2C449&ssl=1" alt="Link Health Icon" /></a>
+				<a href="/" class="w-12"
+					><img
+						src="https://i0.wp.com/link-health.org/wp-content/uploads/2022/10/link-transparent-logo-4.png?fit=460%2C449&ssl=1"
+						alt="Link Health Icon"
+					/></a
+				>
 			</svelte:fragment>
 			{$page.url.pathname.slice(1)}
 			<svelte:fragment slot="trail">
@@ -95,8 +103,7 @@
 	<Drawer>
 		<div class="w-full flex flex-col items-center justify-center p-3">
 			<a href="/User/Settings">
-				<Avatar class="m-4" 
-				initials="{userObj.firstName[0]}{userObj.lastName[0]}" />
+				<Avatar class="m-4" initials="{userObj.firstName[0]}{userObj.lastName[0]}" />
 			</a>
 			<div class="flex flex-col">
 				<a class="btn m-3 variant-outline-primary" href="/Programs">
