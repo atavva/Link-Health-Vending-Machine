@@ -10,7 +10,7 @@
 	// Ret Json Web token
 </script>
 
-<div class="flex flex-row items-center">
+<div class=" h-full flex  flex-row items-center">
 	<div class="flex flex-col align-left justify-center items-start pl-20 h-screen w-full gap-8">
 		<div class="hero">
 			<Fade fadeTime={fadeInterval}>
