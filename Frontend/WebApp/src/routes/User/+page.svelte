@@ -35,7 +35,11 @@
 	$: {
 		userObj = $user;
 	}
+	
 	onMount(async () => {
+		if (userObj.email!= ''){
+			SignedIn = true
+		}
 		const loginResponse = await fetch(`${API_URL}/users`, {
 			headers: {
 				Authorization: `Bearer ${userObj.jwt}`,
@@ -44,7 +48,6 @@
 
 		if (loginResponse.ok) {
 			const { data } = await loginResponse.json();
-			SignedIn = true;
 		} else {
 		}
 
